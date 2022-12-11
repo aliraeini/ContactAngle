@@ -1,13 +1,13 @@
 /*-------------------------------------------------------------------------*\
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -35,15 +35,15 @@ Description
         //~ forAll(f, pI)
         //~ {
             //~ if( pMarks[f[pI]]==fMarks[faceI] ||  (pMarks[f[pI]] == 4 &&  fMarks[faceI] != 2) )
-            //~ { 
+            //~ {
                //~ pNw[f[pI]] += fNorms[faceI];	///. normal vectors to rock surface
             //~ }
             //~ if( pMarks[f[pI]]==fMarks[faceI] ||  (pMarks[f[pI]] == 4 &&  fMarks[faceI] == 2) )
-            //~ { 
+            //~ {
                //~ pNs[f[pI]] += fNorms[faceI];		///. normal vectors to fluid-fluid surface
             //~ }
         //~ }
-        
+
     //~ }
    //~ pNw=pNw/(mag(pNw)+1e-12);
    //~ pNs=pNs/(mag(pNs)+1e-12);
@@ -58,9 +58,9 @@ Description
      {   const face & f=faces[faceI];
          forAll(f, pI)
          {   edge e=f.faceEdge(pI);
-             vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]); 
+             vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI])); 
+             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
              if( pMarks[e[0]]==fMarks[faceI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
              else if( fMarks[faceI] != 2 )        pNw[e[0]] += pNE;
              else                                pNs[e[0]] += pNE;
@@ -69,12 +69,12 @@ Description
              if( pMarks[e[1]]==fMarks[faceI] ) {    pNw[e[1]] -= pNE;    pNs[e[1]] -= pNE;    }
              else if( fMarks[faceI] != 2 )        pNw[e[1]] -= pNE;
              else                                pNs[e[1]] -= pNE;//2.*pNE-mag(pNE)*fNorms[faceI];
-		 }    
+		 }
      }
      scalarField pAreas(0.5*mag(pNs)+1e-18+0.5*mag(pNw));
      pNs/=(mag(pNs)+1e-18);
      pNw/=(mag(pNw)+1e-18);
-		
+
 	const vectorField previousPoints(newPoints);
 
 
@@ -91,7 +91,7 @@ Description
             const labelLoop& neiPoints = pNeips[vertI];
 			{
 				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16); 
+				scalar sumWeights(1e-16);
 				if ( pMarks[vertI] == 4 )
 				{
 				  forAll(neiPoints, neiPointI)
@@ -122,7 +122,7 @@ Description
 
 				  }
 			  }
-			  
+
 				if (sumWeights>0.1)
 				{
 					avgPos /= sumWeights;//myEdges.size();
@@ -135,7 +135,7 @@ Description
             if( pMarks[vertI] == 4  )
             { ///. contact line smoothing
 				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16); 
+				scalar sumWeights(1e-16);
                 forAll(neiPoints, pI)
                 {
                     const label pJ = neiPoints[pI];
@@ -147,7 +147,7 @@ Description
                     }
                 }
 
-                vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI]; 
+                vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI];
                 DispCL =  (DispCL & pNs[vertI])*pNs[vertI];
                 displacementsCL[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
 
@@ -214,4 +214,3 @@ Description
 	Info<< "  avgMag:  "<<average(mag(dispAverage)); cout.flush();
 	Info<< "  avg:  "<<average(dispAverage); cout.flush();
 	Info<<endl;
-

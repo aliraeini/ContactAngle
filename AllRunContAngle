@@ -1,46 +1,50 @@
 #!/bin/bash
 #set -ex
 
-#~ ImageNames=" BLSWa_8bit_500_500_500   "
-ImageNames=$(ls *.mhd | sed 's/.mhd//g')
+if [ -n "$1" ]; then
+    dataFiles=$@
+else
+    dataFiles=$(ls *.mhd)
+fi
+ImageNames=$(echo $dataFiles | sed 's/.mhd//g')
 echo $ImageNames
 
 ################
 
 
-#msSrc=/opt/contactAngleAhmedAlratrout2017/apps
+
 #source $msSrc/contactAngle/bashrc
 # Figure out Paths assuming this file is in src/ContactAngle folder
-myCurrentDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../src" && pwd )
+myCurrentDIR=$( cd "$(dirname "${BASH_SOURCE[0]}")/../../src" && pwd )
 : ${msSrc:=$myCurrentDIR} ; export msSrc
 [ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/bashrc"
 [ -n "$WM_PROJECT" ] || source $msSrc/script/bashrc
 
 
-for ImageName in $ImageNames ; do
- echo "analysing $ImageName"
- if [ -d $ImageName ] ; then 
-   echo "folder $ImageName exist, delete to rerun"
+for ImgNam in $ImageNames ; do
+ echo "analysing $ImgNam"
+ if [ -d $ImgNam ] ; then
+   echo "folder $ImgNam exist, delete to rerun"
  else
-   mkdir $ImageName
-   if [ -d system ]; then cp -r system $ImageName/;
-   else                   cp -r $msSrc/ContAngle/tutorial/system $ImageName/; fi
-   
-   cp $ImageName.* $ImageName/
+   mkdir $ImgNam
+   if [ -d system ]; then cp -r system $ImgNam/;
+   else                   cp -r $msSrc/ContAngle/tutorial/system $ImgNam/; fi
 
-   sed -i 's/subvolume/'"$ImageName"'/g' $ImageName/system/meshingDict
+   echo "read ../${ImgNam}.mhd" >> ${ImgNam}/${ImgNam}.mhd
+   echo "reset s 1e6" >> ${ImgNam}/${ImgNam}.mhd
+
+   sed -i 's/subvolume/'"$ImgNam"'/g' $ImgNam/system/meshingDict
 
 
 
-   echo "(cd $ImageName/ && voxelToSurfaceML) "
+   echo "(cd $ImgNam/ && voxelToSurfaceML) "
 
-  (cd $ImageName/ && voxelToSurfaceML )
-  (cd $ImageName/ && surfaceAddLayerToCL)
-  (cd $ImageName/ && calcContactAngleUnifKc )
-  (cd $ImageName/ && more contactAngles.txt >>Kc.txt)
-  (cd $ImageName/ && more Kc.txt >> *_Layered_Smooth.vtk)
+  (cd $ImgNam/ && voxelToSurfaceML)
+  (cd $ImgNam/ && surfaceAddLayerToCL)
+  (cd $ImgNam/ && calcContactAngleUnifKc)
+  (cd $ImgNam/ && cat contactAngles.txt >>Kc.txt)
+  (cd $ImgNam/ && cat Kc.txt >> *_Layered_Smooth.vtk)
   echo $?
 
  fi
 done
-

@@ -1,24 +1,21 @@
 /*-------------------------------------------------------------------------*\
 This code is part of poreFOAM, a suite of codes written using OpenFOAM
-for direct simulation of flow at the pore scale. 	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+for direct simulation of flow at the pore scale.
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
 
-The code has been developed by Ali Qaseminejad Raeini as a part his PhD 
-at Imperial College London, under the supervision of Branko Bijeljic 
-and Martin Blunt. 
+The code has been developed by Ali Qaseminejad Raeini as a part his PhD
+at Imperial College London, under the supervision of Branko Bijeljic
+and Martin Blunt.
 Please see our website for relavant literature:
 https://www.imperial.ac.uk/earth-science/research/research-groups/pore-scale-modelling/
 
-For further information please contact us by email:
-Ali Q Raeini:    a.q.raeini@imperial.ac.uk
-Branko Bijeljic: b.bijeljic@imperial.ac.uk
-Martin J Blunt:  m.blunt@imperial.ac.uk
- 
+Developed by: Ali Q Raeini (2010-2022)
+
  Description:
 	creates a surface between the pore and the solid from a 3D rock image
 \*-------------------------------------------------------------------------*/
@@ -45,6 +42,7 @@ Martin J Blunt:  m.blunt@imperial.ac.uk
 #include "MeshedSurfaces.H"
 
 #include "voxelImage.h"
+#include "voxelImageI.h"
 #include "createSurface.h"
 
 using namespace Foam;
@@ -88,42 +86,45 @@ int main(int argc, char *argv[])
 	//label nCopyLayers(readLabel(meshingDict.lookup("nCopyLayers"))) ;
 	//Info<<"nCopyLayers: "<<nCopyLayers<<endl;
 
-    vximage.cropD(int3(0),n, 2 ,1);
+	vximage.cropD(int3(0),n, 2 ,1);
 
 	n=vximage.size3();
 
-	vximage.mode(5,true);
-	vximage.mode(4,true);
-	vximage.mode(4,true);
-	vximage.mode(3,true);
-	vximage.mode(2,true);
-	vximage.mode(4,true);
-	vximage.mode(3,true);
-	vximage.mode(2,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(2,true);
-	vximage.mode(2,true);
-	vximage.mode(1,true);
-	vximage.mode(2,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(3,true);
-	vximage.mode(2,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	vximage.mode(1,true);
-	
-			
+	Info<< "\n Filtering image: " << endl;
+
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode26(vximage,6,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+	mode(vximage,2,true);
+
+
     vximage.printInfo();
- 
+
     writeSTLBINARY(vximage, outputSurface);//         XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    
+
     Info<<"finished  writeSTLBINARY, outputFileName: "<<outputSurface<<endl;
 
     Info<< "end" << endl;
@@ -203,14 +204,14 @@ inline int appendSinglyConnectedNeis(label meshPI ,DynamicList<label> & group1, 
 				}
 				else  if (myEdgeFaces[fI]==connectingFace) isMyEdge=true;
 			}
-			
+
 			if (otherFI>=0 && anotherFI>=0)
 			{
 				nCollected+=appendUnique(group1,otherFI);
 				nCollected+=appendUnique(group1,anotherFI);
 			}
 
-			 
+
             if(isMyEdge && handlemultipliConnectedEdges)
             {
 
@@ -255,7 +256,7 @@ inline int appendSinglyConnectedNeis(label meshPI ,DynamicList<label> & group1, 
 
 
 void correct( faceList & faces, labelList& fMarks, DynamicField<point> & points, bool handlemultipliConnectedEdges )
-{ 
+{
 	Info<<"	"<<points.size()<<" points,  "<<faces.size()<<" faces, correcting:  * ";  cout.flush();
 
     // new points and changed faces
@@ -287,15 +288,15 @@ void correct( faceList & faces, labelList& fMarks, DynamicField<point> & points,
 
 			DynamicList<label> group1(myFaces.size());
 
-			group1.append(myFaces[0]); 
+			group1.append(myFaces[0]);
 			while (appendSinglyConnectedNeis(meshPI ,group1,surf1, fMarks,handlemultipliConnectedEdges));
 			appendSinglyConnectedNeis(meshPI ,group1,surf1, fMarks, handlemultipliConnectedEdges);
 
 			if(group1.size()<myFaces.size())
 			{
 				if( (group1.size()<myFaces.size()-2) &&  (group1.size()>2))
-				{ 
-					
+				{
+
 				  bool PreviouslyModified=false;
 				  forAll(group1,gfI)   if (findPos(changedFIndices,group1[gfI])>=0)	PreviouslyModified=true;
 				  if (!PreviouslyModified)
@@ -308,13 +309,13 @@ void correct( faceList & faces, labelList& fMarks, DynamicField<point> & points,
 						face modifiedFace=Sfaces[group1[gfI]];        ///. get the face
 
 						label iModFace=findPos(changedFIndices,group1[gfI]);
-						if (iModFace>=0)	{modifiedFace=modifiedFaces[iModFace];Info<<iModFace<<"Error in correcting faces : dbl cor face"<<endl;}; 
+						if (iModFace>=0)	{modifiedFace=modifiedFaces[iModFace];Info<<iModFace<<"Error in correcting faces : dbl cor face"<<endl;};
 
 						changedFIndices.append(group1[gfI]);
 						label index=findPos(Sfaces[group1[gfI]],pI);
 						if (index>=0)	modifiedFace[index]=iLastPoint; ///. change the face
 						else	Info<<gfI<<":Error in correcting faces : negative array index "<<index<<"  "
-							<<Sfaces[group1[gfI]]<<" "<<nProblemPoints<<" "<<group1[gfI]<<" "<<points[pI]<<endl; 
+							<<Sfaces[group1[gfI]]<<" "<<nProblemPoints<<" "<<group1[gfI]<<" "<<points[pI]<<endl;
 
 						modifiedFaces.append( modifiedFace );  ///. save the changed face
 					}
@@ -324,15 +325,15 @@ void correct( faceList & faces, labelList& fMarks, DynamicField<point> & points,
 			}
 
 		}
-		//~ else if(myFaces.size()<3)  Info<<pI<<": wrong point : "<<points[pI]<<endl; 
+		//~ else if(myFaces.size()<3)  Info<<pI<<": wrong point : "<<points[pI]<<endl;
 
 
 	}
 
 
 
-    Info<< nProblemPoints<< " shared edges,  "; 
-    Info<<"addedPoints: "<<addedPoints.size() <<"  changedFIndices: "<<changedFIndices.size() <<"  changedFaces: "<<modifiedFaces.size()<<"   "; 
+    Info<< nProblemPoints<< " shared edges,  ";
+    Info<<"addedPoints: "<<addedPoints.size() <<"  changedFIndices: "<<changedFIndices.size() <<"  changedFaces: "<<modifiedFaces.size()<<"   ";
 
 	points.append(addedPoints);
 	forAll(changedFIndices,i)	faces[ changedFIndices[i] ]= modifiedFaces[i];
@@ -355,7 +356,7 @@ void correct( faceList & faces, labelList& fMarks, DynamicField<point> & points,
 
 
 void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & points, int stage )
-{ 
+{
     Info<<points.size()<<" points,  "<<faces.size()<<" faces,  stage:"<<stage<<"   correcting: ";  cout.flush();
 
     DynamicList<label>  deletedFacesIndices(faces.size()/100+1);
@@ -395,10 +396,10 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 			{
 				const face& f=Sfaces[myFaces[i]];
 				label mePIinf=f.which(pII);
-				if (mePIinf<0) 
+				if (mePIinf<0)
 				{
 					++nbads;//Info<<"  bad:"<<pI<<" "<<pII<<"  ";
-					
+
 				}
 				else
 				if (pFaces[f.nextLabel(mePIinf)].size() ==3 && pFaces[f.prevLabel(mePIinf)].size() ==3) {++n3fs; delFI=myFaces[i];}
@@ -410,11 +411,11 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 			  {
 				const face& f=Sfaces[myFaces[i]];
 				label mePIinf=f.which(pII);
-				if (mePIinf<0) 
+				if (mePIinf<0)
 				{
 					++nbads;//Info<<"  bad:"<<pI<<" "<<pII<<"  ";
 				}
-				else 
+				else
 				{
 					label opospI=f[(mePIinf+2)%f.size()];
 					if (pFaces[opospI].size() ==3 && pFaces[f.prevLabel(mePIinf)].size()>6 && pFaces[f.nextLabel(mePIinf)].size()>6)
@@ -434,7 +435,7 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 
 			const face& f=Sfaces[delFI];
 			label mePIinf=f.which(pII);
-			if (mePIinf<0) 
+			if (mePIinf<0)
 			{
 				Info<<"  bad:"<<pI<<" "<<pII<<"  ";
 			}
@@ -444,7 +445,7 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 				if(f.nextLabel(mePIinf)<f.prevLabel(mePIinf))
 					{keptP=f.nextLabel(mePIinf);  delP=f.prevLabel(mePIinf);}
 				else{delP=f.nextLabel(mePIinf);  keptP=f.prevLabel(mePIinf);}
-				
+
 				if (pointPointmap[delP]==-1 && pointPointmap[keptP]==-1)
 				{
 					pointPointmap[delP]=keptP;
@@ -454,26 +455,26 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 				}
 			}
 		}
-		//~ else if(myFaces.size()<3)  Info<<pI<<": wrong point : "<<points[pI]<<endl; 
+		//~ else if(myFaces.size()<3)  Info<<pI<<": wrong point : "<<points[pI]<<endl;
 
 
 	}
 
 
 
-    Info<< nProblemPoints<< " dbl 3-nei points in face. bads:"<<nbads<<" *  "; 
+    Info<< nProblemPoints<< " dbl 3-nei points in face. bads:"<<nbads<<" *  ";
 
 
 	{
 		label iLastPoint=-1;
 		forAll(points,i)
 		{
-			if (pointPointmap[i]<0) 
+			if (pointPointmap[i]<0)
 			{
 				points[++iLastPoint]=points[i];
 				pointPointmap[i]=iLastPoint;
 			}
-			else 
+			else
 			{
 				if (pointPointmap[i]>=i) Info<<" Errorsddsfdf "<<endl;
 				pointPointmap[i]=pointPointmap[pointPointmap[i]];
@@ -484,7 +485,7 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 	}
 	Info<<"    "<<points.size()<<" points "<<" ";
 	{
-		
+
 		forAll(deletedFacesIndices,i)	faces[ deletedFacesIndices[i] ].resize(0);
 		label iLastFace=-1;
 		forAll(Sfaces,i)
@@ -500,7 +501,7 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 		faces.resize(iLastFace+1);
 		fMarks.resize(iLastFace+1);
 	}
-    Info<<faces.size()<<" faces "<<endl; 
+    Info<<faces.size()<<" faces "<<endl;
 
 
 }
@@ -510,7 +511,7 @@ void correctbioti( faceList & faces, labelList& fMarks, DynamicField<point> & po
 
 
 void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & points, int stage )
-{ 
+{
     Info<<points.size()<<" points,  "<<faces.size()<<" faces,  stage:"<< stage <<"   correcting: ";  cout.flush();
 
 
@@ -567,7 +568,7 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 			else if (pMarks[f[i]]==-1000) nCLPs-=1000;
 			else nonCLI=i;
 		}
-		
+
 		if (nCLPs==3)
 		{
 			label myMark(fMarks[fI]);
@@ -577,7 +578,7 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 			forAll(faces1,i) 	if(myMark==fMarks[faces1[i]]) ++nSameMark1;
 			const labelList& faces2 = pFaces[f.nextLabel(nonCLI)];
 			forAll(faces2,i) 	if(myMark==fMarks[faces2[i]]) ++nSameMark2;
-			
+
 
 			if( ((nSameMark1>2) != (nSameMark2>2)) || (stage && (nSameMark1>2 || nSameMark2>2)) || (stage>1 && pFaces[f[nonCLI]].size()>3))
 			{
@@ -591,12 +592,12 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 				if (f.which(clP1)<0) {++nbads; Info<<" dsdkedsfgf "<<endl; continue;;}
 				if(nSameMark1>2 || pFaces[fnei[(fnei.which(clP1)+2)%fnei.size()]].size()<4)
 				{
-					faces[myFaces[If1]][ fnei.which(f[nonCLI]) ]=f[(nonCLI+2)%f.size()]; 
-					faces[fI][    f.which(clP1)      ]=   fnei[(fnei.which(clP1)+2)%fnei.size() ] ; 
+					faces[myFaces[If1]][ fnei.which(f[nonCLI]) ]=f[(nonCLI+2)%f.size()];
+					faces[fI][    f.which(clP1)      ]=   fnei[(fnei.which(clP1)+2)%fnei.size() ] ;
 					++nProblemPoints;
 				}
 			  }
-			  else 
+			  else
 			  if(nSameMark2>2 || stage>1 )
 			  {
 				const labelList& myFaces = pFaces[f[nonCLI]];
@@ -605,18 +606,18 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 				const face& fnei = Sfaces[myFaces[If2]];
 				if (fnei.which(f[nonCLI])<0) {++nbads; Info<<" dsdked45 "<<endl; continue;;}
 				if (f.which(clP2)<0) {++nbads; Info<<" dsdkedsfgf "<<endl; continue;;}
-				
+
 				//~ if (magSqr(points[f[nonCLI]]-points[clP2])>0.255*
 				if(nSameMark2>2 || pFaces[fnei[(fnei.which(clP2)+2)%fnei.size()]].size()<4)
 				{
-					faces[myFaces[If2]][ fnei.which(f[nonCLI]) ]=f[(nonCLI+2)%f.size()]; 
-					faces[fI][ f.which(clP2) ]=   fnei[(fnei.which(clP2)+2)%fnei.size()] ; 
+					faces[myFaces[If2]][ fnei.which(f[nonCLI]) ]=f[(nonCLI+2)%f.size()];
+					faces[fI][ f.which(clP2) ]=   fnei[(fnei.which(clP2)+2)%fnei.size()] ;
 					++nProblemPoints;
 				}
 			  }
 			  else Info<<" Errorsshjh";
 			}
-				
+
 			forAll(f,i) pMarks[f[i]]=-1000;
 
 
@@ -629,11 +630,11 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 
 
 
-    Info<< nProblemPoints<< " flips. bads:"<<nbads<<" *       "; 
+    Info<< nProblemPoints<< " flips. bads:"<<nbads<<" *       ";
 
 
 
-    Info<<faces.size()<<" faces, "<<points.size()<<"  points"<<endl;; 
+    Info<<faces.size()<<" faces, "<<points.size()<<"  points"<<endl;;
 
 
 }

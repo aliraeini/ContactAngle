@@ -7,8 +7,8 @@ msSrc ?= $(abspath ../..)
 USE_MINIFOAMX3=1
 OFCs=$(shell find | grep -F .C | sed s:./::)
 srcs=${msSrc}/libvoxel/voxelImage.cpp
-OFincs =   surfMesh meshTools 
-OFlibs =   surfMesh meshTools 
+OFincs =   surfMesh meshTools
+OFlibs =   surfMesh meshTools
 
 USE_ZLIB=1
 USE_TIFF=1

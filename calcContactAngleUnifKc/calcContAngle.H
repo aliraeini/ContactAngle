@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -38,7 +38,7 @@ Description
 	{
 		const labelLoop& neiPoints = pNeips[vertI];
 		if( pMarks[vertI] == 4  ) ///. only for contact line
-		{ 
+		{
 			vector  pNsNei(0,0,0);
 			forAll(neiPoints, neiPointI)
 			{
@@ -54,8 +54,8 @@ Description
 			}
 		}
    }
-   
-   
+
+
 
 /// /////////////////////////////////////////////
 
@@ -137,15 +137,16 @@ Description
 	vector BMid=0.5*(BB.max()+BB.min());
 	scalar radius=0.25*(BB.max()[0]-BB.min()[0]  +  BB.max()[1]-BB.min()[1]);
 
-	Info<< "vxlsize = "<<vxlsize<<endl;;
-	Info<< "BMin = "<<BMin<<endl;;
-	Info<< "BMax = "<<BMax<<endl;;
-	Info<< "BMid = "<<BMid<<endl;;
+	Info<< "vxlsize = "<<vxlsize<<endl;
+	Info<< "image min    = "<<BMin<<endl;
+	Info<< "image max    = "<<BMax<<endl;
+	Info<< "image mid    = "<<BMid<<endl;
+	Info<< "image radius = "<<radius<< " NOT USED! "<<endl;
 	(Info<< " *  ").flush();
 
 		std::ofstream  offContAngle("contactAngles.txt");
 		std::ofstream  offContAngleX("contactAngles_x.txt");
-		
+
 		offContAngle<<"\n\n CA 1 "<<pNeips.size()<<" float"<<std::endl;
 		offContAngleX<<"CA 1 "<<pNeips.size()<<" "<<countCA<<" float"<<std::endl;
 
@@ -162,11 +163,11 @@ Description
 				//~ && mag(points[i][1]-BMax[1])>5.*vxlsize
 				//~ && mag(points[i][2]-BMax[2])>5.*vxlsize
 				//~ )
-				
+
 				///cylindrical image
 				//if(	//TODO fixme
-					//mag(points[i][2]-BMin[2])>5.*vxlsize 
-				 //&& mag(points[i][2]-BMax[2])>5.*vxlsize 
+					//mag(points[i][2]-BMin[2])>5.*vxlsize
+				 //&& mag(points[i][2]-BMax[2])>5.*vxlsize
 				 //&&	mag(BMid - points[i] - ((BMid - points[i])&zz)*zz)<(radius-5.*vxlsize)
 				  //)
 				{
@@ -175,13 +176,13 @@ Description
 					++countCAf;
 				}
 		}
-	
-	
+
+
         forAll(pMarks, vertI)
         {
            if(pMarks[vertI] == 4)
             {
-				offContAngle<<180-std::acos(cosContactAngle[vertI])*180/3.1415926535 <<" "<<"\n";  
+				offContAngle<<180-std::acos(cosContactAngle[vertI])*180/3.1415926535 <<" "<<"\n";
 				//~ offContAngleX<<" "<<points[i][0]<<" "<<points[i][1]<<" "<<points[i][2] << "   "<<-(cosContactAngle[i])<<"  "<<std::acos(cosContactAngle[i])*180/3.1415926535 <<"\n";
 			}
 			if(pMarks[vertI] != 4)
@@ -193,8 +194,5 @@ Description
 
 
 
-		offContAngle.close(); 
+		offContAngle.close();
 		offContAngleX.close();
-
-
-

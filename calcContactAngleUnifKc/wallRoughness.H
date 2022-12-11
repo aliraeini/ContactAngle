@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -69,7 +69,7 @@ Description
          forAll(faces,faceI)
          {
          label corLabel=fMarks[faceI];
-             if ( corLabel==1 || corLabel==3) 
+             if ( corLabel==1 || corLabel==3)
              {///. compute Kcw
                  const face & f=faces[faceI];
                  forAll(f, pI)
@@ -79,9 +79,9 @@ Description
 					 vector L_E=newPoints[e[1]] - newPoints[e[0]];
                      vector Nex2=(pNs[e[0]] + pNs[e[1]]);
                      vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
-                     
+
                      vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[faceI]*/) ^ (Ce-Cf[faceI])) + 0.5*mag(Ce-Cf[faceI])/(mag(L_E)+1e-18)*(L_E);
-				
+
 					 pKcw[e[0]] += Le_se & pNw[e[0]];
 					 pKcw[e[1]] -= Le_se & pNw[e[1]];
                  }
@@ -89,10 +89,10 @@ Description
          }
          pKcw /= (pAreas);
          Kcw = mag(pKcw);
-         
+
          //Info << "pKcw = "<<pKcw;cout.flush();
          //Info << "Kcw = "<<Kcw;cout.flush();
-		
+
 //#include "curvatureMove.H"
 		//Info <<"     Kcw: "<<Kcw; cout.flush();
       Info <<"     Roughness original,"; cout.flush();
@@ -106,7 +106,7 @@ Description
 			{
 				//vector Ra(vector::zero);
 				scalar R(pKcwTmp[vertI]);
-				scalar sumWeights(1e-16); 
+				scalar sumWeights(1e-16);
 				if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
 				{
 				  forAll(neiPoints, neiPointI)
@@ -121,8 +121,8 @@ Description
 					else{
 						R = 0;
 					}
-					
-					
+
+
 				  }
 
 			    }
@@ -152,7 +152,7 @@ Description
 				const labelLoop& neiPoints = pointPoints[vertI];
 				label currentLabel = pMarks[vertI];
 				if( currentLabel == 1 || currentLabel == 3 || currentLabel == 4  )
-				{ ///. calculating smooth curvature  
+				{ ///. calculating smooth curvature
 					scalar avgAKcp(pKcwSmoothTmp[vertI]);
 					scalar sumWeightsKc(1.);
 					forAll(neiPoints, neiPointI)
@@ -160,7 +160,7 @@ Description
 						const label neiVertI = neiPoints[neiPointI];
 						if( currentLabel == 1 || currentLabel == 3 || pMarks[neiVertI] == 4  )
 						{
-							scalar weight=pWeights[neiVertI];  
+							scalar weight=pWeights[neiVertI];
 							//weight*=weight;weight*=weight;
 							//if( pMarks[neiVertI] == 4) weight*=0.01;
 							//~ if( pMarks[neiVertI] == 4 && currentLabel == 4) weight=10.;
@@ -187,7 +187,7 @@ Description
 				const labelLoop& neiPoints = pointPoints[vertI];
 				label currentLabel = pMarks[vertI];
 				if( currentLabel == 1 || currentLabel == 3 || currentLabel == 4  )
-				{ ///. calculating smooth curvature  
+				{ ///. calculating smooth curvature
 					scalar avgAKcp(pKcwSmooth2Tmp[vertI]);
 					scalar sumWeightsKc(1.);
 					forAll(neiPoints, neiPointI)
@@ -195,7 +195,7 @@ Description
 						const label neiVertI = neiPoints[neiPointI];
 						if( currentLabel == 1 || currentLabel == 3 || pMarks[neiVertI] == 4  )
 						{
-							scalar weight=pWeights[neiVertI];  
+							scalar weight=pWeights[neiVertI];
 							//weight*=weight;weight*=weight;
 							//if( pMarks[neiVertI] == 4) weight*=0.01;  ///.  TODO change 0.01 : 0-1
 							//~ if( pMarks[neiVertI] == 4 && currentLabel == 4) weight=10.;
@@ -252,16 +252,16 @@ Description
 
 
 		vector avgPos(vector::zero);
-		scalar sumWeights(1e-28); 
+		scalar sumWeights(1e-28);
 		//if ( pMarks[vertI] == 4 )
 		//{
 			//forAll(neiPoints, neiPointI)
 			//{
 				//const label neiVertI = neiPoints[neiPointI];
-			
+
 				//scalar weight=(pAreas[neiVertI]+0.1*pAreas[vertI]);//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
 				//weight*=weight*pWeights[neiVertI];
-				//if( pMarks[neiVertI]!=currentLabel ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence 
+				//if( pMarks[neiVertI]!=currentLabel ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence
 				//point neiPos=newPoints[neiVertI];
 				//if( pMarks[neiVertI]==2 )
 				//{
@@ -288,7 +288,7 @@ Description
 
 		  }
 		}
-		  
+
 			if (sumWeights>1e-18)
 			{
 				avgPos /= sumWeights;//myEdges.size();
@@ -299,7 +299,7 @@ Description
 			//~ if( currentLabel == 4  )
 			//~ { ///. contact line smoothing
 				//~ vector avgPos(vector::zero);
-				//~ scalar sumWeights(1e-16); 
+				//~ scalar sumWeights(1e-16);
 				//~ forAll(neiPoints, iii)
 				//~ {
 					//~ const label neiVertI = neiPoints[iii];
@@ -310,7 +310,7 @@ Description
 						//~ sumWeights += weight;
 					//~ }
 				//~ }
-				//~ vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI]; 
+				//~ vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI];
 				//~ DispCL =  (DispCL & pNs[vertI])*pNs[vertI];
 				//~ displacementsCL[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
 			//~ }
@@ -318,10 +318,10 @@ Description
       }
 	  newPoints += 0.5*relax*(displacements - 0.5*(displacements& pNw)*pNw);     ///.  TODO change 0.2
 	  //~ newPoints += 0.03*relaxCL*displacementsCL;
-	
+
 
 /// moving contact line back to the solid wall (alleviate the crunch effect)
-	
+
 	  displacements=newPoints-previousPoints2;
 
 	 scalarField D = mag(displacements);
@@ -335,7 +335,7 @@ Description
 		{ ///. contact line smoothing Vol preserve
 			const labelLoop& neiPoints = pointPoints[vertI];
 			vector avgDisp(vector::zero);
-			scalar sumWeights(1e-28); 
+			scalar sumWeights(1e-28);
 			forAll(neiPoints, iii)
 			{
 				const label neiVertI = neiPoints[iii];
@@ -358,7 +358,7 @@ Description
 	displacements = 0.3*displacements+0.7*(displacements& pNw)*pNw;
 	//displacements = 0.3*displacements+0.7*(displacements& pNs)*pNs;
 	newPoints -= 1.05*displacements;     ///.  TODO change 0.5 0.5,  sum should be 1
-	
+
 		Info  <<"CL "; cout.flush();
 
 
@@ -384,7 +384,7 @@ Description
             const labelLoop& neiPoints = pointPoints[vertI];
 			{
 				scalar RS(D[vertI]);
-				scalar sumWeights(1e-16); 
+				scalar sumWeights(1e-16);
 				if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
 				{
 				  forAll(neiPoints, neiPointI)
@@ -409,7 +409,7 @@ Description
 					//Ra[vertI] = 1/Ra[vertI];
 				//}
 			}
-			
+
 		}
     }
     //Ra = RaS-Ra;
@@ -421,12 +421,12 @@ Description
 	forAll(pointPoints, vertI)
 	{
 		label currentLabel = pMarks[vertI];
-		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)	
+		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)
 		{
 			offRaX<<"";
 			offRaX<<points[vertI][0]<<" "<<points[vertI][1]<<" "<<points[vertI][2]<<" "<<Ra[vertI]<<" \n";
 		}
-	}		
+	}
 	offRaX.close();
 
    ///Ra.txt
@@ -435,18 +435,17 @@ Description
 	forAll(pMarks, vertI)
 	{
 		label currentLabel = pMarks[vertI];
-		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)	
+		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)
 		{
 			offRa<< Ra[vertI] <<" \n";
 		}else{
 			offRa<<  0 <<"\n";
 		}
-   }		
+   }
    offRa.close();
- 
+
 
 
 	Info<< "  maxRa:  "<<max(Ra); cout.flush();
 	Info<< "  avgRa:  "<<average(Ra); cout.flush();
 	Info<<endl;
-

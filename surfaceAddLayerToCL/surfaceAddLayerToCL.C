@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     IOdictionary meshingDict
     (  IOobject ( "meshingDict", runTime.system(),  runTime, IOobject::MUST_READ  ) );
     dictionary smoothingDict(meshingDict.subDict("addLayerToCL"));
-    
+
     word surfFileName(smoothingDict.lookup("inputSurface"));
 
     fileName outFileName(smoothingDict.lookup("outputSurface"));
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 
 	/// rock-water interface -> 1
-	/// rock-oil   interface -> 3		
+	/// rock-oil   interface -> 3
 	/// oil-water interface -> 2
 	/// contact line points ->  4
 
@@ -94,8 +94,8 @@ int main(int argc, char *argv[])
 		Info<< "pMarks     : " << min(pMarks)<<" - "<< max(pMarks)<< endl;
 		Info<<"........"<<endl<<endl ;
 	}
-	
-	
+
+
 
 
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 	Info<<"  marking new points" <<endl;
 
 	///. generate a list of new points and faces to be added:
-	///. 3 points for each contact line point and 3 faces for 
+	///. 3 points for each contact line point and 3 faces for
 	///. each contact line edge
 	int iNewP=-1, iNewF=-1;
 	forAll(edges, ei)
@@ -146,11 +146,11 @@ int main(int argc, char *argv[])
 
 		faceList facesSorted_All(faces.size()+3*newfacs.size());
 		labelList zoneSizes(3);
-		
+
 		///. detach old faces of zone 1 from the contact line  and connect to new vertex indices
 		int indF=-1;
 		for (int i=0; i<faces.size(); ++i) /// water-rock interface
-		  if(fMarks[i]==1) 
+		  if(fMarks[i]==1)
 		  {
 			face f=faces[i];
 			forAll(f, fi)	if(pNewPsP3[f[fi]]>=0) f[fi] = points.size()+pNewPsP3[f[fi]]*3+0; ///. detach and connect to new vertex indices
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 		for (int i=0; i<newfacs.size(); ++i)
 		{
 			face f=newfacs[i];
-			
+
 			f[2] = f[1];  /// contact line edge vertices
 			f[3] = f[0];  /// contact line edge vertices
 			f[1] = points.size()+pNewPsP3[f[1]]*3+0;  ///. new vertex index
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 		zoneSizes[0]=indF+1;
 
 		for (int i=0; i<faces.size(); ++i) /// water-oil interface		///. same as above, zone 2
-		  if(fMarks[i]==2) 
+		  if(fMarks[i]==2)
 		  {
 			face f=faces[i];
 			forAll(f, fi)	if(pNewPsP3[f[fi]]>=0) f[fi] = points.size()+pNewPsP3[f[fi]]*3+1;
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 
 
 		for (int i=0; i<faces.size(); ++i)  /// oil-rock interface		///. same as above, zone 3
-		  if(fMarks[i]==3) 
+		  if(fMarks[i]==3)
 		  {
 			face f=faces[i];
 			forAll(f, fi)	if(pNewPsP3[f[fi]]>=0) f[fi] = points.size()+pNewPsP3[f[fi]]*3+2;
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 		///. create new point positions, 3 for each conact line vertex
 		Field<point> pointsNew((iNewP+1)*3, point(100.,100.,100.));
 		forAll(points, pi)
-		  if(pNewPsP3[pi]>=0) 
+		  if(pNewPsP3[pi]>=0)
 		  {
 			  pointsNew[pNewPsP3[pi]*3]=points[pi];
 			  pointsNew[pNewPsP3[pi]*3+1]=points[pi];

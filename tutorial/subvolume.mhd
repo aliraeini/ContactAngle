@@ -13,45 +13,47 @@ ElementDataFile = subvolume.raw.gz
 Unit = 1
 
 
-//HeaderSize = 0 
-//OutputFormat = .raw.gz 
+//HeaderSize = 0
+//OutputFormat = .raw.gz
 
 //!__________  optional image processing (ordered) commands ____________
 //!_____________  uncomment (remove '//') to activate  _________________
 
 //! crop image  [  Nxyz_begin    Nxyz_end   )
-//crop               0 0 0       300 300 300 
-  
-//! flip x direction with y or z 
+//crop               0 0 0       300 300 300
+
+//! flip x direction with y or z
 //direction   z
-  
+
 //! manipulate voxel values: range [start end]  -> value
-//! replaceRange   start  end   value   
-//replaceRange       0      127     0    
-//replaceRange       128    255     1    
-  
-//! threshold image: [range] -> 0 (void-space), rest->1 (solid) 
-//threshold           0  128 
+//! replaceRange    start  end   value
+//replaceRange       0      63      0 // water
+//replaceRange       63     127     1 // rock
+//replaceRange       128    255     2 // gas/oil
 
+//! Make image coarser, eliminating small-scale noise,
+//! to make it easier for the contact angle code
+// resampleMode 2
 
-
-
+//! Denoise the segmented image
+//!          nIterations  threshold#neighbours  kernel volume (6 or 26)
+// modeFilter    2               2                   26
 
 //! ### Format Specifications:
 //! All keyword data should be provided in a single line.
-//! 
+//!
 //! The first unrecognised keyword together with the rest of the file will
-//! be ignored. 
+//! be ignored.
 
 
-//! DNS/PNM codes can read .am, .tif, .raw.gz, .raw and .txt/.dat files. 
+//! DNS/PNM codes can read .am, .tif, .raw.gz, .raw and .txt/.dat files.
 //! The format is detected from the image suffix in ElementDataFile keyword.
 
-//! When the image format is .raw or .raw.gz, this file can be opened in 
+//! When the image format is .raw or .raw.gz, this file can be opened in
 //! ImageJ/Fiji or Paraview to load the image.  For tif images, you should
 //! open the .tif file directly.
 
-//! When using .raw.gz, .raw and the image is not UChar and not written 
+//! When using .raw.gz, .raw and the image is not UChar and not written
 //! in little-endian, add the following keyword before the ElementDataFile:
 //!  ElementByteOrderMSB = True
 
@@ -63,20 +65,19 @@ Unit = 1
 //! = is used only in the standard mhd keywords (the first 10 lines) but
 //! not in the DNS/PNM commands and keywords.
 
-//! When the image is in .tif format, all the keywords can be dropped, but 
+//! When the image is in .tif format, all the keywords can be dropped, but
 //! to ensure the voxel-size is correct the keywords ElementSize and
-//! Offset can be provided to override those read from .tif tags. 
+//! Offset can be provided to override those read from .tif tags.
 //! In .tif format, the keyword DimSize is redundant and hence ignored.
 
-//! lines BEGINING with "#" and "//" are considered as comments and skipped, 
+//! lines BEGINING with "#" and "//" are considered as comments and skipped,
 //! but no comment is allowed before the keyword ElementDataFile.
 
-//! A syntax highlighting hack: associate the .mhd suffix with C++: 
+//! A syntax highlighting hack: associate the .mhd suffix with C++:
 //! In geany in "Tools -> Configuration files -> filetype_extensions.conf"
 //! or by menu "Document -> Set Filetype -> Programming Languages -> C++".
 
 
 
-//! Hint: setting `ElementSize = 1 1 1` and `Unit = 1` means that 
+//! Hint: setting `ElementSize = 1 1 1` and `Unit = 1` means that
 //! cuvratures in ContactAngle code will have a unit of 1/voxelLength
-

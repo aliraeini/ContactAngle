@@ -21,7 +21,7 @@ maxExecutionTime   48000;
 maxS1   1.;
 minS1   0.05;
 
- endTime  5.; 
+ endTime  5.;
 
 deltaT          1e-7;
 
@@ -31,7 +31,7 @@ writeInterval   200;
 
 purgeWrite      0;
 
- writeFormat  binary; 
+ writeFormat  binary;
 
 writePrecision  8;
 
@@ -46,9 +46,9 @@ runTimeModifiable yes;
 adjustTimeStep  yes;
 
 maxCo           0.1;
- maxAlphaCo  40; 
+ maxAlphaCo  40;
 
- maxDeltaT  4e-5; 
+ maxDeltaT  4e-5;
 
 
 // ************************************************************************* //

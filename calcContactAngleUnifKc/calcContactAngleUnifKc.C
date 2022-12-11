@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 
 runTime++;
 Info<< "Time = " << runTime.timeName() << "\n" << endl;
- 
- 
+
+
     IOdictionary meshingDict
     (
         IOobject
@@ -77,12 +77,12 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
         )
     );
     dictionary smoothingDict(meshingDict.subDict("surfaceSmoothing"));
-    
+
     word surfFileName(smoothingDict.lookup("inputSurface"));
 
     fileName outFileName(smoothingDict.lookup("outputSurface"));
 
-    
+
 
 
 
@@ -137,7 +137,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 		/// rock-water interface -> 1
-		/// rock-oil   interface -> 3		
+		/// rock-oil   interface -> 3
 		/// oil-water interface -> 2
 		/// contact line points ->  4
 
@@ -214,7 +214,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 ///   ///////////////////////////////////////////////////////
 
 
-	{ 
+	{
 		Info<< "volume preserving Gaussian smoothing"<< endl;
 		Info<< "Reading keywords from system/meshingDict -> surfaceSmoothing:"<< endl;
 		label nIters(readLabel(smoothingDict.lookup("nIterationsGaussVP")));
@@ -239,7 +239,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 
-	{ 
+	{
 		Info<< "curvature move/smoothing 1"<< endl;
 		Info<< "Reading keywords from system/meshingDict -> surfaceSmoothing:"<< endl;
 		label nIters(readLabel(smoothingDict.lookup("nIterationsCurvature1")));
@@ -253,7 +253,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 		if ((relaxCL < 0) || (relaxCL > 1))
 				FatalErrorIn(args.executable()) << "Illegal CL relaxation factor " << relaxCL
 				 << endl << "0: no change 1: move vertices to average of neighbours" << exit(FatalError);
-		
+
 		Info<< "  nIterationsCurvature1:   " << nIters << endl;
 		Info<< "  kernelRadiusCurvature1:  " << kernelRadius << endl;
 		Info<< "  relaxFactorCurvature1:   " << relax << endl;
@@ -267,7 +267,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 		Info<<"smoothed  :/"<<endl<<endl;
 	}//===================================================================================
 
-	{ 
+	{
 		Info<< "curvature move/smoothing, second round"<< endl;
 		label  nIters(      readLabel (smoothingDict.lookup("nIterationsCurvature")));
 		label  kernelRadius(readLabel (smoothingDict.lookup("kernelRadiusCurvature")));
@@ -280,7 +280,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 		if ((relaxCL < 0) || (relaxCL > 1))
 				FatalErrorIn(args.executable()) << "Illegal CL relaxation factor " << relaxCL
 				 << endl << "0: no change 1: move vertices to average of neighbours" << exit(FatalError);
-		
+
 		Info<< "  nIterationsCurvature:   " << nIters << endl;
 		Info<< "  kernelRadiusCurvature:  " << kernelRadius << endl;
 		Info<< "  relaxFactorCurvature:   " << relax << endl;
@@ -316,7 +316,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 	Info << "\n"<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	<< " ClockTime = " << runTime.elapsedClockTime() << " s"
 	<< "\n" << endl;
-	 
+
     Info << "End\n" << endl;
 
     return 0;

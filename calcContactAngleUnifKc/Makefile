@@ -1,13 +1,12 @@
 
-
 all: msApp
 
-msSrc ?= $(abspath ../..)
+msSrc ?= ${abspath ../..}
 
 USE_MINIFOAMX3=1
 OFCs=$(shell find | grep -F .C | sed s:./::)
-OFincs =   surfMesh
-OFlibs =   surfMesh
+OFincs = surfMesh
+OFlibs = surfMesh
 
 msCFLAGS += -IincompressibleTwoPhaseMixture
 USE_msMAKE=1
