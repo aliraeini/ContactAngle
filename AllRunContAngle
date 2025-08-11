@@ -1,5 +1,7 @@
 #!/bin/bash
-#set -ex
+set -e
+
+#NB! This script is copied to bin folder, run `make` after editing it!
 
 if [ -n "$1" ]; then
     dataFiles=$@
@@ -14,11 +16,11 @@ echo $ImageNames
 
 
 #source $msSrc/contactAngle/bashrc
-# Figure out Paths assuming this file is in src/ContactAngle folder
+# Figure out Paths assuming this file is in src/ContactAngle folder , or in bin/foam4m
 myCurrentDIR=$( cd "$(dirname "${BASH_SOURCE[0]}")/../../src" && pwd )
 : ${msSrc:=$myCurrentDIR} ; export msSrc
-[ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/bashrc"
-[ -n "$WM_PROJECT" ] || source $msSrc/script/bashrc
+[ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/foam.bashrc"
+[ -n "$WM_PROJECT" ] || source $msSrc/script/foam.bashrc
 
 
 for ImgNam in $ImageNames ; do
@@ -35,16 +37,13 @@ for ImgNam in $ImageNames ; do
 
    sed -i 's/subvolume/'"$ImgNam"'/g' $ImgNam/system/meshingDict
 
-
-
    echo "(cd $ImgNam/ && voxelToSurfaceML) "
 
   (cd $ImgNam/ && voxelToSurfaceML)
   (cd $ImgNam/ && surfaceAddLayerToCL)
   (cd $ImgNam/ && calcContactAngleUnifKc)
   (cd $ImgNam/ && cat contactAngles.txt >>Kc.txt)
-  (cd $ImgNam/ && cat Kc.txt >> *_Layered_Smooth.vtk)
-  echo $?
+  (cd $ImgNam/ && cat Kc.txt >> ${ImgNam}_Layered_Smooth.vtk)
 
  fi
 done
