@@ -11,6 +11,6 @@ endif
 
 clean:; $(MAKE) -f  ${msSrc}/script/Makefile.in  recurseClean USE_msRecurse=1
 
-tsts=test.sh
+tsts=test.py
 USE_msTEST=1
 include  ${msSrc}/script/Makefile.in
