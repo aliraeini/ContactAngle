@@ -22,3 +22,7 @@ write dump.tif
 
 runSh('.', "AllRunContAngle")
 # FIXME: Number 55.0 is not analytical
+errc =  fileFloatDiffersFrom("AllRunContAngle.log","ContactAngMax", 55.0, 0.2)
+errc += fileFloatDiffersFrom("AllRunContAngle.log","ContactAngMin", 55.0, 0.2)
+errc += fileFloatDiffersFrom("AllRunContAngle.log","ContactAngAvg", 55.0, 0.1)
+exit(errc)

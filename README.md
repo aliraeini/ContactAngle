@@ -74,7 +74,7 @@ voxelToSurfaceML
 surfaceAddLayerToCL
 calcContactAngleUnifKc
 cat contactAngles.txt >> Kc.txt
-cat Kc.txt >> *_Layered_Smooth.vtk
+cat Kc.txt >> IMAGENAME_Layered_Smooth.vtk
 ```
 
 This command will execute the following:

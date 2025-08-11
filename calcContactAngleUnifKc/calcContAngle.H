@@ -114,7 +114,6 @@ Description
 
 
 	int countCA = 0;
-	int countCAf = 0;
 	forAll(pNeips, vertI)
 	{
 
@@ -150,32 +149,27 @@ Description
 		offContAngle<<"\n\n CA 1 "<<pNeips.size()<<" float"<<std::endl;
 		offContAngleX<<"CA 1 "<<pNeips.size()<<" "<<countCA<<" float"<<std::endl;
 
+	double CAsum = 0., CAmin = 1e16, CAmax = -1e16;
+	int    CLnum = 1e-36;
+	constexpr double rad2Degree = 180/3.1415926535;
 
-        for (int i=0; i<pMarks.size(); ++i)
-        {
-			if(pMarks[i] == 4)
-				///cubical image
-				//~ if(
-				   //~ mag(points[i][0]-BMin[0])>5.*vxlsize
-				//~ && mag(points[i][1]-BMin[1])>5.*vxlsize
-				//~ && mag(points[i][2]-BMin[2])>5.*vxlsize
-				//~ && mag(points[i][0]-BMax[0])>5.*vxlsize
-				//~ && mag(points[i][1]-BMax[1])>5.*vxlsize
-				//~ && mag(points[i][2]-BMax[2])>5.*vxlsize
-				//~ )
 
-				///cylindrical image
-				//if(	//TODO fixme
-					//mag(points[i][2]-BMin[2])>5.*vxlsize
-				 //&& mag(points[i][2]-BMax[2])>5.*vxlsize
-				 //&&	mag(BMid - points[i] - ((BMid - points[i])&zz)*zz)<(radius-5.*vxlsize)
-				  //)
-				{
-					//~ offContAngle<<-(cosContactAngle[i])<<"  "<<std::acos(cosContactAngle[i])*180/3.1415926535 <<"\n";
-					offContAngleX<<" "<<points[i][0]<<" "<<points[i][1]<<" "<<points[i][2] << " "<<-(cosContactAngle[i])<<" "<<180-std::acos(cosContactAngle[i])*180/3.1415926535 <<"\n";
-					++countCAf;
-				}
+	for (int i=0; i<pMarks.size(); ++i)
+	{
+		if(pMarks[i] == 4) {
+			double cosCA = -cosContactAngle[i];
+			offContAngleX<<" "<<points[i][0]<<" "<<points[i][1]<<" "<<points[i][2] << " "<<cosCA<<" "<<std::acos(cosCA)*rad2Degree <<"\n";
+
+			CAmin = std::min(CAmin, cosCA);
+			CAmax = std::max(CAmax, cosCA);
+			CAsum += cosCA;
+			++CLnum;
 		}
+	}
+	// Used in regression tests:
+	std::cout<<"\n  ContactAngMax: "<< rad2Degree*std::acos(CAmin)
+	         <<"\n  ContactAngMin: "<< rad2Degree*std::acos(CAmax)
+	         <<"\n  ContactAngAvg: "<< rad2Degree*std::acos(CAsum/CLnum) <<std::endl;
 
 
         forAll(pMarks, vertI)

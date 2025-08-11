@@ -14,10 +14,12 @@ and Martin Blunt.
 Please see our website for relavant literature:
 https://www.imperial.ac.uk/earth-science/research/research-groups/pore-scale-modelling/
 
-Developed by: Ali Q Raeini (2010-2022)
+Developed by:
+- Ali Q Raeini (2010-2025)
+- Ahmed AlRarout (2015?-2018)
 
  Description:
-	creates a surface between the pore and the solid from a 3D rock image
+	creates a surface between two fluid phases and solid phase in a 3D image
 \*-------------------------------------------------------------------------*/
 
 using namespace Foam; // !!!
@@ -35,9 +37,8 @@ void writeSTLBINARY( const voxelImage & vxlImg, std::string outputSurface)
 	Info<<"writeSTLBINARY: "<<endl;
 	int3 n=vxlImg.size3();
 	int nx_2=n[0]-2, ny_2=n[1]-2, nz_2=n[2]-2;
-	dbl3 X0=vxlImg.X0();
 	dbl3 dx=vxlImg.dx();
-	X0+=dx;
+	dbl3 X1=vxlImg.X0() + dx;
 
 
 
@@ -139,13 +140,12 @@ void writeSTLBINARY( const voxelImage & vxlImg, std::string outputSurface)
 
 
 
-	#define addPointToFace_m(pointIndex, kkk,jjj,iii, type)                                 \
-    if (point_mapper(iii,jjj,kkk)<0)                                                  \
-		{                                                                                   \
-		    points.append(point(dx.x*(iii+1.)+X0.x, dx.y*(jjj+1.)+X0.y, dx.z*(kkk+1.)+X0.z));     \
-        point_mapper(iii,jjj,kkk)=++iPoints;                                          \
-		}                                                                              \
-    faces_##type[i##type ##Faces][pointIndex]=point_mapper(iii,jjj,kkk);
+	#define addPointToFace_m(pointIndex, kkk,jjj,iii, type)                    \
+		if (point_mapper(iii,jjj,kkk)<0) {                                        \
+			points.append(point(dx.x*(iii)+X1.x, dx.y*(jjj)+X1.y, dx.z*(kkk)+X1.z)); \
+			point_mapper(iii,jjj,kkk)=++iPoints;                                      \
+		}                                                                            \
+		faces_##type[i##type ##Faces][pointIndex]=point_mapper(iii,jjj,kkk);
 
 
 	#define recordFaces_m( l10,l11,l20,l21,l30,l31, ii,jj,kk,type )                      \
