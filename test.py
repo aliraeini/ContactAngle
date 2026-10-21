@@ -17,7 +17,8 @@ img.write("dropInCylinder.mhd")
 
 run_sh('.', "rm -rf  dropInCylinder")
 run_sh('.', "AllRunContAngle")
-errc =  read_deviates("AllRunContAngle.log","ContactAngMax", 177.8, 0.2)
-errc += read_deviates("AllRunContAngle.log","ContactAngMin", 5.78, 0.2)
-errc += read_deviates("AllRunContAngle.log","ContactAngAvg", 76.5, 0.1)
+# reference: results of the original code (porescale b37dfe1), not analytical
+errc =  read_deviates("AllRunContAngle.log","ContactAngMax", 62.7336, 0.01)
+errc += read_deviates("AllRunContAngle.log","ContactAngMin", 46.3434, 0.01)
+errc += read_deviates("AllRunContAngle.log","ContactAngAvg", 55.0465, 0.01)
 exit(errc)
