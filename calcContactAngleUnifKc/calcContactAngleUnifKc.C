@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 #   include "setRootCase.H"
 #   include "createTime.H"
 
-runTime++;
-Info<< "Time = " << runTime.timeName() << "\n" << endl;
+	runTime++;
+	Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
     IOdictionary meshingDict
@@ -84,9 +84,6 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 
-
-
-
     Info<< "Reading surface from " << surfFileName << " ..." << endl;
 
     meshedSurface surf123(surfFileName);
@@ -96,7 +93,6 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
     Info<< "nVertices     : " << surf123.nPoints() << endl;
     Info<< "nZones     : " << surf123.surfZones().size() << endl;
     Info<< "Bounding Box : " << boundBox(surf123.localPoints()) << endl;
-
 
 
 
@@ -117,19 +113,11 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
     }
 
     forAll(pNeips,i)
-    {
-        //pNeips[i].setSize(pointPointsTmp[i].size());
         pNeips[i]=face(pointPointsTmp[i]);
-    }
 
     pointField newPoints(points);
 
     Info<<"\n........"<<endl<<endl ;
-//~ exit(-1);
-
-
-
-
 
 
 
@@ -310,16 +298,16 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 
-    surf123.write(outFileName);
+	surf123.write(outFileName);
 
 
 	Info << "\n"<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	<< " ClockTime = " << runTime.elapsedClockTime() << " s"
 	<< "\n" << endl;
 
-    Info << "End\n" << endl;
+	Info << "End\n" << endl;
 
-    return 0;
+	return 0;
 }
 
 

@@ -30,15 +30,16 @@ void correctbioti2( faceList & faces, labelList& fMarks, DynamicField<point> & p
 
 
 
-void writeSTLBINARY( const voxelImage & vxlImg, std::string outputSurface)
+void writeSTLBINARY( const VoxelImage & vxlImg, std::string outputSurface)
 {
 
 
 	Info<<"writeSTLBINARY: "<<endl;
 	int3 n=vxlImg.size3();
 	int nx_2=n[0]-2, ny_2=n[1]-2, nz_2=n[2]-2;
+	dbl3 X0=vxlImg.X0();
 	dbl3 dx=vxlImg.dx();
-	dbl3 X1=vxlImg.X0() + dx;
+	X0+=dx;
 
 
 
@@ -125,7 +126,7 @@ void writeSTLBINARY( const voxelImage & vxlImg, std::string outputSurface)
 
 
 
-	voxelField<int> point_mapper(n[0]+1,n[1]+1,n[2]+1,-1);
+	VoxelField<int> point_mapper(n[0]+1,n[1]+1,n[2]+1,-1);
 
 	DynamicField<point> points;
 
@@ -140,10 +141,10 @@ void writeSTLBINARY( const voxelImage & vxlImg, std::string outputSurface)
 
 
 
-	#define addPointToFace_m(pointIndex, kkk,jjj,iii, type)                    \
-		if (point_mapper(iii,jjj,kkk)<0) {                                        \
-			points.append(point(dx.x*(iii)+X1.x, dx.y*(jjj)+X1.y, dx.z*(kkk)+X1.z)); \
-			point_mapper(iii,jjj,kkk)=++iPoints;                                      \
+	#define addPointToFace_m(pointIndex, kkk,jjj,iii, type)                                 \
+		if (point_mapper(iii,jjj,kkk)<0) {                                                                                   \
+			points.append(point(dx.x*(iii+1.)+X0.x, dx.y*(jjj+1.)+X0.y, dx.z*(kkk+1.)+X0.z));     \
+			point_mapper(iii,jjj,kkk)=++iPoints;                                          \
 		}                                                                            \
 		faces_##type[i##type ##Faces][pointIndex]=point_mapper(iii,jjj,kkk);
 

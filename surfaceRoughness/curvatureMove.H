@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -89,14 +89,14 @@ Description
 					 vector L_E=newPoints[e[1]] - newPoints[e[0]];
                      vector Nex2=(pNs[e[0]] + pNs[e[1]]);
                      vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
-                     
+
                      /// big impact...!!
                      //~ vector Le_se = 0.5*(0.5*Nex2+fNorms[faceI]) ^ (Ce-Cf[faceI]); ///. wrong
                      //~ vector Le_se = 0.33333*(Nex2+fNorms[faceI]) ^ (Ce-Cf[faceI]);
                      vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[faceI]*/) ^ (Ce-Cf[faceI])) + 0.5*mag(Ce-Cf[faceI])/(mag(L_E)+1e-18)*(L_E);
 
-					
-					
+
+
 					 pKc[e[0]] += Le_se & pNs[e[0]];
 					 pKc[e[1]] -= Le_se & pNs[e[1]];
 					 if (pMarks[e[0]]==4 && pMarks[e[1]]==4)
@@ -118,11 +118,11 @@ Description
 					 vector L_E=newPoints[e[1]] - newPoints[e[0]];
                      vector Nex2=(pNs[e[0]] + pNs[e[1]]);
                      vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
-                     
+
                      //~ vector Le_se = 0.5*(0.5*Nex2+fNorms[faceI]) ^ (Ce-Cf[faceI]); ///. wrong
                      //~ vector Le_se = 0.33333*(Nex2+fNorms[faceI]) ^ (Ce-Cf[faceI]);
                      vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[faceI]*/) ^ (Ce-Cf[faceI])) + 0.5*mag(Ce-Cf[faceI])/(mag(L_E)+1e-18)*(L_E);
-				
+
 					 pKcw[e[0]] += Le_se & pNw[e[0]];
 					 pKcw[e[1]] -= Le_se & pNw[e[1]];
                  }
@@ -133,7 +133,7 @@ Description
          pKcCL /= pLCL;
 		pAreas=pAreastmp;
 
-     //~ forAll(pMarks, vertI)    if(pMarks[vertI]==4) pKc[vertI]*=1.1;
+     //~ forAll(pMarks, pI)    if(pMarks[pI]==4) pKc[pI]*=1.1;
 
 
 
@@ -275,12 +275,12 @@ Description
 
             //~ if( currentLabel == 4  )
             //~ { ///. contact line curvature uniformization
-               //~ vector DispCL =  relaxCL*(-0.05*(pKcSmooth[vertI]-pKc[vertI])+ 5.*(pKcCL[vertI]-pKcCLSmooth[vertI]))* pAreas[vertI]*pNs[vertI];
-               //~ displacementsRc[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
+               //~ vector DispCL =  relaxCL*(-0.05*(pKcSmooth[pI]-pKc[pI])+ 5.*(pKcCL[pI]-pKcCLSmooth[pI]))* pAreas[pI]*pNs[pI];
+               //~ displacementsRc[pI] =  (DispCL - (DispCL & pNw[pI])*pNw[pI]);
             //~ }
             //~ else  if(currentLabel == 2)
             //~ {  ///. curvature uniformization
-                //~ displacementsRc[vertI] =  relax*(pKc[vertI]-pKcSmooth[vertI]) * pAreas[vertI]*pNs[vertI];
+                //~ displacementsRc[pI] =  relax*(pKc[pI]-pKcSmooth[pI]) * pAreas[pI]*pNs[pI];
             //~ }
 		}
 

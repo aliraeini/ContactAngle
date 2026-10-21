@@ -25,28 +25,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 
-///. point-normal vectors
-    //~ const vectorField & fNorms(surf123.faceNormals());
-    //~ vectorField pNw(pNeips.size(),vector(0,0,0));
-    //~ vectorField pNs(pNeips.size(),vector(0,0,0));
-    //~ forAll(faces,faceI)
-    //~ {
-        //~ const face & f=faces[faceI];
-        //~ forAll(f, pI)
-        //~ {
-            //~ if( pMarks[f[pI]]==fMarks[faceI] ||  (pMarks[f[pI]] == 4 &&  fMarks[faceI] != 2) )
-            //~ {
-               //~ pNw[f[pI]] += fNorms[faceI];	///. normal vectors to rock surface
-            //~ }
-            //~ if( pMarks[f[pI]]==fMarks[faceI] ||  (pMarks[f[pI]] == 4 &&  fMarks[faceI] == 2) )
-            //~ {
-               //~ pNs[f[pI]] += fNorms[faceI];		///. normal vectors to fluid-fluid surface
-            //~ }
-        //~ }
-
-    //~ }
-   //~ pNw=pNw/(mag(pNw)+1e-12);
-   //~ pNs=pNs/(mag(pNs)+1e-12);
 
 
 ///. point-normal vectors
@@ -164,12 +142,11 @@ Description
 
 
 
-	Info <<"     Volume-preservation "; cout.flush();
+Info <<"   Preserve Volume, "; cout.flush();
 
-	vectorField dispAverage(newPoints-previousPoints);
+vectorField dispAverage(newPoints-previousPoints);
 
-  for (int iKern=0; iKern<kernelRadius+2; ++iKern)
-  {
+for (int iKern=0; iKern<kernelRadius+2; ++iKern)  {
 	const vectorField dispAverageTmp(dispAverage);
 
 	//~ vectorField NormalsOld(pNw);

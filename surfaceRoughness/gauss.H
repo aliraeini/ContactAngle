@@ -1,13 +1,13 @@
 /*-------------------------------------------------------------------------*\
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -34,9 +34,9 @@ Description
      {   const face & f=faces[faceI];
          forAll(f, pI)
          {   edge e=f.faceEdge(pI);
-             vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]); 
+             vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI])); 
+             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
              if( pMarks[e[0]]==fMarks[faceI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
              else if( fMarks[faceI] != 2 )        pNw[e[0]] += pNE;
              else                                pNs[e[0]] += pNE;

@@ -24,7 +24,7 @@ Developed by: Ali Q Raeini (2010-2022)
     #include <iostream>
     #include <vector>
 
-    #include <assert.h>
+    #include <cassert>
 
 #include "faceList.H"
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 
 
-	voxelImage vximage(headerName);
+	VoxelImage vximage(std::string(headerName), readOpt::procAndConvert);
 
 	int3 n=vximage.size3();
 
@@ -94,22 +94,22 @@ int main(int argc, char *argv[])
 
 	mode(vximage,2,true);
 	mode(vximage,2,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
-	mode26(vximage,6,true);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
+	mode26(vximage,6);
 	mode(vximage,2,true);
 	mode(vximage,2,true);
 	mode(vximage,2,true);
@@ -217,14 +217,14 @@ inline int appendSinglyConnectedNeis(label meshPI ,DynamicList<label> & group1, 
 
 
                 SortableList<scalar> closeNess(myEdgeFaces.size(), selectMin ? 1000.: -1000. );
-                vector masterNormal=faces[connectingFace].normal(points);
-                vector Ce=0.5*(points[meshPoints[edges[eI][0]]]+points[meshPoints[edges[eI][1]]]);
-                vector tmf=faces[connectingFace].centre(points)-Ce;
+                Foam::vector masterNormal=faces[connectingFace].normal(points);
+                Foam::vector Ce=0.5*(points[meshPoints[edges[eI][0]]]+points[meshPoints[edges[eI][1]]]);
+                Foam::vector tmf=faces[connectingFace].centre(points)-Ce;
                 tmf/=mag(tmf)+1e-15;
 
                 forAll(myEdgeFaces, fI) if ( myEdgeFaces[fI]!=connectingFace && fMarks[myEdgeFaces[fI]]==fMarks[connectingFace] )
                 {
-					vector tf=faces[myEdgeFaces[fI]].centre(points)-Ce;
+					Foam::vector tf=faces[myEdgeFaces[fI]].centre(points)-Ce;
 					tf/=mag(tf)+1e-15;
 					scalar sin=tf&masterNormal;
 					scalar cos=tf&tmf;
