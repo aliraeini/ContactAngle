@@ -32,8 +32,10 @@ Description
 #include "boundBox.H"
 
 using namespace Foam;
-
-
+#define for_ forAll
+#define dbl3 Foam::vector
+#define dbl3s Foam::vectorField
+#define dbls Foam::scalarField
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Main program:
 int appendUnique(DynamicList<label>& dynList, label value)
@@ -58,8 +60,9 @@ int appendUnique(DynamicList<label>& dynList, label value)
 int main(int argc, char *argv[])
 {
 
-#   include "setRootCase.H"
-#   include "createTime.H"
+	using Foam::sqrt;
+	#include "setRootCase.H"
+	#include "createTime.H"
 
 	runTime++;
 	Info<< "Time = " << runTime.timeName() << "\n" << endl;
@@ -154,7 +157,10 @@ int main(int argc, char *argv[])
 
       for (int ii=0; ii<3; ++ii)
       {
-		for (label i=zones[1].start(); i<zones[2].start();  ++i)  forAll(faces[i],pi) if (pMarks[faces[i][pi]]!=2) { pWeights[faces[i][pi]]=0.25;   }
+		for (label i=zones[1].start(); i<zones[2].start();  ++i)
+			forAll(faces[i],pI)
+				if (pMarks[faces[i][pI]]!=2)
+					pWeights[faces[i][pI]]=0.25;
 
 		scalarField pWeightsOrig(pWeights);
 		forAll(pNeips, pI) {
