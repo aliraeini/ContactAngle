@@ -1,0 +1,3 @@
+VxlPy {
+  img.read_from_header("../dropInCylinder.mhd")
+}

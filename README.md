@@ -17,7 +17,7 @@ In the following, this document is organized into three sections. First is **Ins
 
 For build instruction, see [../../script/README.md](https://github.com/aliraeini/ContactAngle/blob/master/src/script/README.md).
 
-Note: Not all OpenFOAM codes support the surface zones required by this code and can not be used instead of the foamx4m provided in the pkgs folder.
+Note: Not all OpenFOAM codes support the surface zones required by this code and can not be used instead of the foamxm provided in the pkgs folder.
 
 
 # Usage

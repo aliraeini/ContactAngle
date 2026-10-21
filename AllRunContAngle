@@ -15,12 +15,12 @@ echo $ImageNames
 
 
 
-#source $msSrc/contactAngle/bashrc
-# Figure out Paths assuming this file is in src/ContactAngle folder , or in bin/foam4m
-myCurrentDIR=$( cd "$(dirname "${BASH_SOURCE[0]}")/../../src" && pwd )
-: ${msSrc:=$myCurrentDIR} ; export msSrc
-[ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/foam.bashrc"
-[ -n "$WM_PROJECT" ] || source $msSrc/script/foam.bashrc
+# Figure out Paths assuming this file is in src/ContactAngle folder
+myDir=`cd "$(dirname "${BASH_SOURCE[0]}")/" && pwd`
+[ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $myDir/script/foam.bashrc"
+[ -n "$WM_PROJECT" ] || source $myDir/script/foam.bashrc \
+                     || source $myDir/../script/foam.bashrc \
+                     || source $myDir/../src/script/foam.bashrc
 
 
 for ImgNam in $ImageNames ; do
@@ -29,11 +29,9 @@ for ImgNam in $ImageNames ; do
    echo "folder $ImgNam exist, delete to rerun"
  else
    mkdir $ImgNam
-   if [ -d system ]; then cp -r system $ImgNam/;
-   else                   cp -r $msSrc/ContAngle/tutorial/system $ImgNam/; fi
-
-   echo "read ../${ImgNam}.mhd" >> ${ImgNam}/${ImgNam}.mhd
-   echo "reset s 1e6" >> ${ImgNam}/${ImgNam}.mhd
+   voxelImageProcPy ${ImgNam}.mhd "img.print_info(); img.spacing = dbl3(1, 1, 1)" ${ImgNam}/${ImgNam}.mhd
+   if [ -d system ]; then cp -r          system $ImgNam/;
+   else  cp -r $myDir/ContAngle/tutorial/system $ImgNam/;  fi
 
    sed -i 's/subvolume/'"$ImgNam"'/g' $ImgNam/system/meshingDict
 

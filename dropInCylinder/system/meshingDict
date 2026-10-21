@@ -1,0 +1,73 @@
+
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      meshingDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+//! voxelToSurfaceML keywords
+headerName dropInCylinder.mhd;
+outputSurface  dropInCylinder.vtk;
+
+addLayerToCL
+{
+	inputSurface   "dropInCylinder.vtk";
+	outputSurface   "dropInCylinder_Layered.vtk";
+}
+
+
+
+surfaceSmoothing
+{
+	inputSurface   "dropInCylinder_Layered.vtk";
+	outputSurface   "dropInCylinder_Layered_Smooth.vtk";
+
+	relaxationFactor   0.5;
+	extraRelaxFactorParIntrf   0.2;
+
+
+	kernelRadiusGaussVP	3;
+	nIterationsGaussVP	20;
+	relaxFactorGaussVP	0.05;
+	relaxFactorGaussVPCL	0.05;
+
+
+
+	kernelRadiusCurvature1	12;
+	nIterationsCurvature1	100;
+	relaxFactorCurvature1	0.05;
+	relaxFactorCurvature1CL	0.05;
+
+
+
+	kernelRadiusCurvature	12;
+	nIterationsCurvature	100;
+	relaxFactorCurvature	0.05;
+	relaxFactorCurvatureCL	0.05;
+
+
+
+	kernelRadiusRoughness	12;
+
+}
+
+surfaceRoughness
+{
+	inputSurface   "dropInCylinder_Layered.vtk";
+	outputSurface   "dropInCylinder_Layered_Smooth_Roughness.vtk";
+
+	//extraRelaxFactorParIntrf   0.2;
+
+	kernelRadiusRoughness	10;
+	nIterationsRoughness	200;
+	relaxFactorRoughness	0.05;
+	relaxFactorRoughnessCL	0.05;
+}
+
+
+// ************************************************************************* //

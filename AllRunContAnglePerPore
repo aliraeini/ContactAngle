@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -e
+
+if [ -n "$1" ]; then
+    dataFiles=$@
+else
+    dataFiles=$(ls *.mhd)
+fi
+ImageNames=$(echo $dataFiles | sed 's/.mhd//g')
+echo $ImageNames
+
+################
+
+
+#msSrc=/opt/contactAngleAhmedAlratrout2017/apps
+#source $msSrc/contactAngle/bashrc
+# Figure out Paths assuming this file is in src/ContactAngle folder
+myCurrentDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../src" && pwd )
+: ${msSrc:=$myCurrentDIR} ; export msSrc
+[ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/bashrc"
+[ -n "$WM_PROJECT" ] || source $msSrc/script/bashrc
+
+
+for ImgNam in $ImageNames ; do
+ echo "analysing $ImgNam"
+ if [ -d $ImgNam ] ; then
+   echo "folder $ImgNam exist, delete to rerun"
+ else
+   mkdir $ImgNam
+   if [ -d system ]; then cp -r system $ImgNam/;
+   else                   cp -r $msSrc/ContAngle/tutorial/system $ImgNam/; fi
+
+   echo "read ../${ImgNam}.mhd" >> ${ImgNam}/${ImgNam}.mhd
+   echo "reset s 1e6" >> ${ImgNam}/${ImgNam}.mhd
+
+   sed -i 's/subvolume/'"$ImgNam"'/g' $ImgNam/system/meshingDict
+
+
+
+   echo "(cd $ImgNam/ && voxelToSurfaceML) "
+
+  (cd ${ImgNam}/ && voxelToSurfaceML)
+  (cd ${ImgNam}/ && surfaceAddLayerToCL)
+  (cd ${ImgNam}/ && calcContactAngleUnifKc)
+  (cd ${ImgNam}/ && cat contactAngles.txt >>Kc.txt)
+  (cd ${ImgNam}/ && cat Kc.txt >>  ${ImgNam}_Layered_Smooth.vtk)
+  if [ -n "$PORE_NETWORK" ]; then
+     cp  ${PORE_NETWORK}_VElems.* ${ImgNam}/
+     cp  ${PORE_NETWORK}_VElems.mhd ${ImgNam}/${ImgNam}_VElems.mhd
+  else
+     echo " VxlPro {read ../${ImgNam}.mhd;
+            replaceRange 2 2  0; }; name ${ImgNam}; " >> ${ImgNam}/${ImgNam}_pnm.mhd
+     (cd ${ImgNam}/ && pnextract ${ImgNam}_pnm.mhd)
+  fi
+  (cd ${ImgNam}/ && writeCAPoreInds ${ImgNam})
+  echo $?
+  echo end
+
+ fi
+done
