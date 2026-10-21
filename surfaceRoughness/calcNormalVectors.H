@@ -30,48 +30,46 @@ Description
 
 
      //~ vectorField fNorms(faces.size(),vector(0,0,0));
-     //~ forAll(faces,faceI)
-     //~ {   const face & f=faces[faceI];
+     //~ forAll(faces,fI)
+     //~ {   const face & f=faces[fI];
          //~ forAll(f, pI)
          //~ {    label pCur=f[pI];
-             //~ fNorms[faceI] += (newPoints[pCur]-newPoints[f.prevLabel(pI)])^(newPoints[f.nextLabel(pI)]-newPoints[pCur]);
+             //~ fNorms[fI] += (newPoints[pCur]-newPoints[f.prevLabel(pI)])^(newPoints[f.nextLabel(pI)]-newPoints[pCur]);
      //~ }    }
      //~ fNorms=fNorms/(mag(fNorms)+1e-12);
 
 ///. point-normal vectors
      vectorField pAw(pointPoints.size(),vector(0,0,0));
      vectorField pAs(pointPoints.size(),vector(0,0,0));
-     forAll(faces,faceI)
-     {   const face & f=faces[faceI];
-         forAll(f, pI)
-         {   edge e=f.faceEdge(pI);
+     forAll(faces,fI) {
+         const face & f=faces[fI];
+         forAll(f, pI) {
+            edge e=f.faceEdge(pI);
              vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-             vector AEdgeTri=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
+             vector AEdgeTri=0.5*((newPoints[e[0]]-Cf[fI]) ^ (Ce-Cf[fI]));
 
-				 if( pMarks[e[0]]==fMarks[faceI] )
-				 {
+				 if( pMarks[e[0]]==fMarks[fI] ) {
 					 pAw[e[0]] += AEdgeTri;
 					 pAs[e[0]] += AEdgeTri;
 				 }
-				 else if( fMarks[faceI] != 2 )
-				 {
+				 else if( fMarks[fI] != 2 )  {
 					 pAw[e[0]] += AEdgeTri;
 				 }
 				 else
 					 pAs[e[0]] += AEdgeTri;
 
-				AEdgeTri=0.5*((newPoints[e[1]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
+				AEdgeTri=0.5*((newPoints[e[1]]-Cf[fI]) ^ (Ce-Cf[fI]));
 
-				 if( pMarks[e[1]]==fMarks[faceI] )
+				 if( pMarks[e[1]]==fMarks[fI] )
 				 {
 					 pAw[e[1]] -= AEdgeTri;
 					 pAs[e[1]] -= AEdgeTri;
 				 }
-				 else if( fMarks[faceI] != 2 )
+				 else if( fMarks[fI] != 2 )
 					 pAw[e[1]] -= AEdgeTri;
 				 else
-					 pAs[e[1]] -= AEdgeTri;//2.*AEdgeTri-mag(AEdgeTri)*fNorms[faceI];
+					 pAs[e[1]] -= AEdgeTri;//2.*AEdgeTri-mag(AEdgeTri)*fNorms[fI];
 		  }
 	  }
      //~ scalarField pAreas(0.5*mag(pAs)+1e-16);
@@ -83,16 +81,16 @@ Description
 ///. point-normal vectors BC correction
       //{
           //vectorField pNNormB(pointPoints.size(),vector(0,0,0));
-          //forAll(faces,faceI)
-          //{   const face & f=faces[faceI];
+          //forAll(faces,fI)
+          //{   const face & f=faces[fI];
               //vector pNsS(0.,0.,0.);
               //forAll(f, pI)
-              //{    if( fMarks[faceI]!=2 && pMarks[f[pI]]==fMarks[faceI] )
+              //{    if( fMarks[fI]!=2 && pMarks[f[pI]]==fMarks[fI] )
                       //pNsS+=pNs[f[pI]];
               //}
               //forAll(f, pI)
               //{
-                  //if( fMarks[faceI]!=2 && pMarks[f[pI]]!=fMarks[faceI] )
+                  //if( fMarks[fI]!=2 && pMarks[f[pI]]!=fMarks[fI] )
                       //pNNormB[f[pI]]+= pNsS*f.mag(points);
               //}
           //}
@@ -101,23 +99,21 @@ Description
       //}
 
 	///. point-normal vectors correction at contact line (BC), using linear extrapolation
-	forAll(pointPoints, vertI)
+	forAll(pointPoints, pI)
 	{
-		const labelLoop& neiPoints = pointPoints[vertI];
-		if( pMarks[vertI] == 4  ) ///. only for contact line
+		const labelLoop& neiPoints = pointPoints[pI];
+		if( pMarks[pI] == 4  ) ///. only for contact line
 		{
 			vector  pNsNei(0,0,0);
-			forAll(neiPoints, neiPointI)
-			{
-				const label neiVertI = neiPoints[neiPointI];
-				if( pMarks[neiVertI] == 2 )
-					pNsNei += pNs[neiVertI];
+			for(label pJ: neiPoints) {
+				if( pMarks[pJ] == 2 )
+					pNsNei += pNs[pJ];
 			}
 			if (mag(pNsNei)>0.1)
 			{
 				pNsNei /= mag(pNsNei);
-				pNs[vertI]=1.333*pNs[vertI]-0.333*pNsNei;
-				pNs[vertI] /= mag(pNs[vertI]);
+				pNs[pI]=1.333*pNs[pI]-0.333*pNsNei;
+				pNs[pI] /= mag(pNs[pI]);
 			}
 		}
    }

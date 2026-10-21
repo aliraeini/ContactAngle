@@ -34,23 +34,23 @@ Description
 
 
 	///. point-normal vectors correction at contact line (BC), using linear extrapolation TODO: Change 3.333, remove ...
-	forAll(pNeips, vertI)
+	forAll(pNeips, pI)
 	{
-		const labelLoop& neiPoints = pNeips[vertI];
-		if( pMarks[vertI] == 4  ) ///. only for contact line
+		const labelLoop& neiPoints = pNeips[pI];
+		if( pMarks[pI] == 4  ) ///. only for contact line
 		{
 			vector  pNsNei(0,0,0);
 			forAll(neiPoints, neiPointI)
 			{
-				const label neiVertI = neiPoints[neiPointI];
-				if( pMarks[neiVertI] == 2  )
-					pNsNei += pNs[neiVertI];
+				const label pJ = neiPoints[neiPointI];
+				if( pMarks[pJ] == 2  )
+					pNsNei += pNs[pJ];
 			}
 			if (mag(pNsNei)>0.1)
 			{
 				pNsNei /= mag(pNsNei);
-				pNs[vertI]=1.333*pNs[vertI]-0.333*pNsNei;
-				pNs[vertI] /= mag(pNs[vertI]);
+				pNs[pI]=1.333*pNs[pI]-0.333*pNsNei;
+				pNs[pI] /= mag(pNs[pI]);
 			}
 		}
    }
@@ -64,18 +64,18 @@ Description
   {
 	const vectorField pAwTmp(pAw);
 
-	forAll(pNeips, vertI)
+	forAll(pNeips, pI)
 	{
 		vector avgDisp(vector::zero);
-		const labelLoop& neiPoints = pNeips[vertI];
-		if(pMarks[vertI]!=2)
+		const labelLoop& neiPoints = pNeips[pI];
+		if(pMarks[pI]!=2)
 		forAll(neiPoints, neiPointI)
 		{
-			const label neiVertI = neiPoints[neiPointI];
-			if( pMarks[neiVertI]!=2 )
-				avgDisp += pAwTmp[neiVertI];
+			const label pJ = neiPoints[neiPointI];
+			if( pMarks[pJ]!=2 )
+				avgDisp += pAwTmp[pJ];
 		}
-		pAw[vertI] = avgDisp;//myEdges.size();
+		pAw[pI] = avgDisp;//myEdges.size();
 	  }
 	}
   vectorField  pNw=pAw/(mag(pAw)+1e-12);
@@ -85,18 +85,18 @@ Description
   for (int iKern=0; iKern<5; ++iKern)
   {
 	const vectorField pNsTmp(pNs);
-	forAll(pNeips, vertI)
+	forAll(pNeips, pI)
 	{
 		vector avgDisp(vector::zero);
-		const labelLoop& neiPoints = pNeips[vertI];
-		if(pMarks[vertI]==4)
+		const labelLoop& neiPoints = pNeips[pI];
+		if(pMarks[pI]==4)
 		forAll(neiPoints, neiPointI)
 		{
-			const label neiVertI = neiPoints[neiPointI];
-			if( pMarks[neiVertI]==2 ) 	avgDisp += 0.5*pNsTmp[neiVertI];
-			if( pMarks[neiVertI]==4 )	avgDisp += pNsTmp[neiVertI];
+			const label pJ = neiPoints[neiPointI];
+			if( pMarks[pJ]==2 ) 	avgDisp += 0.5*pNsTmp[pJ];
+			if( pMarks[pJ]==4 )	avgDisp += pNsTmp[pJ];
 		}
-		pNs[vertI] = avgDisp;//myEdges.size();
+		pNs[pI] = avgDisp;//myEdges.size();
 	  }
 	}
    pNs=pNs/(mag(pNs)+1e-12);
@@ -114,12 +114,12 @@ Description
 
 
 	int countCA = 0;
-	forAll(pNeips, vertI)
+	forAll(pNeips, pI)
 	{
 
-		if(pMarks[vertI] == 4)
+		if(pMarks[pI] == 4)
 		{
-			cosContactAngle[vertI] = pNs[vertI] & pNw[vertI] ;
+			cosContactAngle[pI] = pNs[pI] & pNw[pI] ;
 			++countCA;
 	    }
 
@@ -172,14 +172,14 @@ Description
 	         <<"\n  ContactAngAvg: "<< rad2Degree*std::acos(CAsum/CLnum) <<std::endl;
 
 
-        forAll(pMarks, vertI)
+        forAll(pMarks, pI)
         {
-           if(pMarks[vertI] == 4)
+           if(pMarks[pI] == 4)
             {
-				offContAngle<<180-std::acos(cosContactAngle[vertI])*180/3.1415926535 <<" "<<"\n";
+				offContAngle<<180-std::acos(cosContactAngle[pI])*180/3.1415926535 <<" "<<"\n";
 				//~ offContAngleX<<" "<<points[i][0]<<" "<<points[i][1]<<" "<<points[i][2] << "   "<<-(cosContactAngle[i])<<"  "<<std::acos(cosContactAngle[i])*180/3.1415926535 <<"\n";
 			}
-			if(pMarks[vertI] != 4)
+			if(pMarks[pI] != 4)
 			{
 				offContAngle<<  0 <<" "<<"\n";
 			}

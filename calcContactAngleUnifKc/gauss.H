@@ -28,116 +28,93 @@ Description
 
 
 ///. point-normal vectors
-     pointField Cf=surf123.faceCentres();
+pointField Cf=surf123.faceCentres();
 
-     vectorField pNw(pNeips.size(),vector(0,0,0));
-     vectorField pNs(pNeips.size(),vector(0,0,0));
-     forAll(faces,faceI)
-     {   const face & f=faces[faceI];
-         forAll(f, pI)
-         {   edge e=f.faceEdge(pI);
-             vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
+vectorField pNw(pNeips.size(),vector(0,0,0));
+vectorField pNs(pNeips.size(),vector(0,0,0));
+	forAll(faces,fI)  {
+		const face & f=faces[fI];
+		forAll(f, pI)  {
+			edge e=f.faceEdge(pI);
+			vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
-             if( pMarks[e[0]]==fMarks[faceI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
-             else if( fMarks[faceI] != 2 )        pNw[e[0]] += pNE;
-             else                                pNs[e[0]] += pNE;
+            vector pNE=0.5*((newPoints[e[0]]-Cf[fI]) ^ (Ce-Cf[fI]));
+            if( pMarks[e[0]]==fMarks[fI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
+            else if( fMarks[fI] != 2 )        pNw[e[0]] += pNE;
+            else                                pNs[e[0]] += pNE;
 
-             pNE=0.5*((newPoints[e[1]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
-             if( pMarks[e[1]]==fMarks[faceI] ) {    pNw[e[1]] -= pNE;    pNs[e[1]] -= pNE;    }
-             else if( fMarks[faceI] != 2 )        pNw[e[1]] -= pNE;
-             else                                pNs[e[1]] -= pNE;//2.*pNE-mag(pNE)*fNorms[faceI];
-		 }
-     }
+            pNE=0.5*((newPoints[e[1]]-Cf[fI]) ^ (Ce-Cf[fI]));
+            if( pMarks[e[1]]==fMarks[fI] ) {    pNw[e[1]] -= pNE;    pNs[e[1]] -= pNE;    }
+            else if( fMarks[fI] != 2 )        pNw[e[1]] -= pNE;
+            else                                pNs[e[1]] -= pNE;//2.*pNE-mag(pNE)*fNorms[fI];
+		}
+	}
      scalarField pAreas(0.5*mag(pNs)+1e-18+0.5*mag(pNw));
-     pNs/=(mag(pNs)+1e-18);
-     pNw/=(mag(pNw)+1e-18);
+pNs/=(mag(pNs)+1e-18);
+pNw/=(mag(pNw)+1e-18);
 
-	const vectorField previousPoints(newPoints);
+const vectorField previousPoints(newPoints);
 
 
 
-	//===========================================================================
-      Info<< iter   <<"  "; cout.flush();
-      for (int iKern=0; iKern<kernelRadius; ++iKern)
-      {
-        vectorField displacements(newPoints.size(), vector(0,0,0));
-        vectorField displacementsCL(newPoints.size(), vector(0,0,0));
-        forAll(pNeips, vertI)
-        {
+//===========================================================================
+Info<< iter   <<"  "; cout.flush();
+for (int iKern=0; iKern<kernelRadius; ++iKern)  {
+	  vectorField displacements(newPoints.size(), vector(0,0,0));
+	  vectorField displacementsCL(newPoints.size(), vector(0,0,0));
+	  forAll(pNeips, pI)  {
 
-            const labelLoop& neiPoints = pNeips[vertI];
-			{
-				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16);
-				if ( pMarks[vertI] == 4 )
-				{
-				  forAll(neiPoints, neiPointI)
-				  {
-					const label pJ = neiPoints[neiPointI];
-					if( pMarks[pJ]!=2 )
-					{
-						//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[vertI],0.001);// /mag(newPoints[pJ]-newPoints[vertI]);
-						scalar weight=(pAreas[pJ]+0.3*pAreas[vertI]);//*max(NormalsOld[pJ]&NormalsOld[vertI],0.001);// /mag(newPoints[pJ]-newPoints[vertI]);
-						weight*=weight*pWeights[pJ];
-						avgPos += weight * newPoints[pJ];
-						sumWeights += weight;
-					}
-				  }
-
-			  }
-			  else
-			  {
-			    forAll(neiPoints, neiPointI)
-				  {
-					const label pJ = neiPoints[neiPointI];
-
-					//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[vertI],0.001);// /mag(newPoints[pJ]-newPoints[vertI]);
-					scalar weight=(pAreas[pJ]+0.3*pAreas[vertI]);//*max(NormalsOld[pJ]&NormalsOld[vertI],0.001);// /mag(newPoints[pJ]-newPoints[vertI]);
+		const labelLoop& neiPoints = pNeips[pI];
+		{
+			vector avgPos(vector::zero);
+			scalar sumWeights(1e-16);
+			if ( pMarks[pI] == 4 )
+			  for(label pJ:neiPoints)  {
+				if( pMarks[pJ]!=2 ) {
+					//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+					scalar weight=(pAreas[pJ]+0.3*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
 					weight*=weight*pWeights[pJ];
 					avgPos += weight * newPoints[pJ];
 					sumWeights += weight;
-
-				  }
-			  }
-
-				if (sumWeights>0.1)
-				{
-					avgPos /= sumWeights;//myEdges.size();
-					displacements[vertI] = avgPos-newPoints[vertI]; //(0.8*relax)*((avgPos-newPoints[vertI])&pNw[vertI])*pNw[vertI] + (0.2*relax)*(avgPos-newPoints[vertI]);
 				}
+			 }
+		  else for(label pJ:neiPoints)  {
+					//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+					scalar weight=(pAreas[pJ]+0.3*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+					weight*=weight*pWeights[pJ];
+					avgPos += weight * newPoints[pJ];
+					sumWeights += weight;
+			  }
+			if (sumWeights>0.1) {
+				avgPos /= sumWeights;//myEdges.size();
+				displacements[pI] = avgPos-newPoints[pI]; //(0.8*relax)*((avgPos-newPoints[pI])&pNw[pI])*pNw[pI] + (0.2*relax)*(avgPos-newPoints[pI]);
 			}
+		}
 
 
 
-            if( pMarks[vertI] == 4  )
-            { ///. contact line smoothing
-				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16);
-                forAll(neiPoints, pI)
-                {
-                    const label pJ = neiPoints[pI];
-                    if( pMarks[pJ] == 4  )
-                    {
-                        scalar weight=1.;
-                        avgPos += weight * newPoints[pJ];
-                        sumWeights += weight;
-                    }
-                }
+		if( pMarks[pI] == 4 ) { ///. contact line smoothing
+			vector avgPos(vector::zero);
+			scalar sumWeights(1e-16);
+			for(label pJ: neiPoints)
+			 if( pMarks[pJ] == 4  ) {
+						scalar weight=1.;
+						avgPos += weight * newPoints[pJ];
+						sumWeights += weight;
+			 }
 
-                vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI];
-                DispCL =  (DispCL & pNs[vertI])*pNs[vertI];
-                displacementsCL[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
+            vector DispCL =  (avgPos/sumWeights-newPoints[pI]); // relax*((avgPos/sumWeights-newPoints[pI])&pNs[pI])*pNs[pI];
+            DispCL =  (DispCL & pNs[pI])*pNs[pI];
+            displacementsCL[pI] =  (DispCL - (DispCL & pNw[pI])*pNw[pI]);
 
-            }
-
-      }
-
-		Info  <<"Gauss "; cout.flush();
-		newPoints += (1.-extraRelaxFactorParIntrf)*relax*(displacements & pNw)*pNw + (extraRelaxFactorParIntrf*relax)*(displacements);
-		newPoints += relaxCL*displacementsCL;
+        }
 
     }
+
+	Info  <<"Gauss "; cout.flush();
+	newPoints += (1.-extraRelaxFactorParIntrf)*relax*(displacements & pNw)*pNw + (extraRelaxFactorParIntrf*relax)*(displacements);
+	newPoints += relaxCL*displacementsCL;
+}
 
 
 
@@ -149,45 +126,41 @@ vectorField dispAverage(newPoints-previousPoints);
 for (int iKern=0; iKern<kernelRadius+2; ++iKern)  {
 	const vectorField dispAverageTmp(dispAverage);
 
-	//~ vectorField NormalsOld(pNw);
-	forAll(pNeips, vertI)
-	{
+	forAll(pNeips, pI) {
 		vector avgDisp(vector::zero);
 		scalar sumWeights(1e-16);
 
-		const labelLoop& neiPoints = pNeips[vertI];
-		label currentLabel = pMarks[vertI];
+		const labelLoop& neiPoints = pNeips[pI];
+		label currentLabel = pMarks[pI];
 		bool curentLabelEq2 = currentLabel==2;
 
-		forAll(neiPoints, neiPointI)
-		{
-			const label pJ = neiPoints[neiPointI];
+		for(label pJ:neiPoints)  {
 
-			if( pMarks[pJ]==currentLabel || !( (pMarks[pJ]==2) ^ curentLabelEq2)  || pMarks[pJ] == 4  )
-			{
+			if( pMarks[pJ]==currentLabel || !( (pMarks[pJ]==2) ^ curentLabelEq2)  || pMarks[pJ] == 4  ) {
 				scalar weight=pAreas[pJ];
 				if( pMarks[pJ]!=currentLabel ) weight*=0.05;
 				avgDisp += weight * dispAverageTmp[pJ];
 				sumWeights += weight;
 			}
 		}
-		dispAverage[vertI] = avgDisp/sumWeights;//myEdges.size();
-	  }
+		dispAverage[pI] = avgDisp/sumWeights;//myEdges.size();
 	}
+}
 
 
-	dispAverage -= 0.3*(dispAverage-(dispAverage& pNw)*pNw);
-	dispAverage -= 0.3*(dispAverage-(dispAverage& pNs)*pNs);
-	newPoints -= 1.09*dispAverage;     ///.  TODO change 0.5 0.5,  sum should be 1
+dispAverage -= 0.3*(dispAverage-(dispAverage& pNw)*pNw);
+dispAverage -= 0.3*(dispAverage-(dispAverage& pNs)*pNs);
+newPoints -= 1.09*dispAverage;     ///.  TODO change 0.5 0.5,  sum should be 1
 
 
 
-	surf123.movePoints(newPoints);
+surf123.movePoints(newPoints);
 
 
-	dispAverage=(newPoints-previousPoints);
+dispAverage=(newPoints-previousPoints);
 
-	Info<< "  max:  "<<max(mag(dispAverage)); cout.flush();
-	Info<< "  avgMag:  "<<average(mag(dispAverage)); cout.flush();
-	Info<< "  avg:  "<<average(dispAverage); cout.flush();
-	Info<<endl;
+Info<< "  Disp max :  "<<max(mag(dispAverage));
+Info<< "  avg:  "<<average(mag(dispAverage));
+//Info<< "  avg:  "<<average(dispAverage);
+Info<< "  Amin:  "<<min(pAreas);
+Info<<endl;

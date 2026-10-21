@@ -157,29 +157,26 @@ int main(int argc, char *argv[])
 		for (label i=zones[1].start(); i<zones[2].start();  ++i)  forAll(faces[i],pi) if (pMarks[faces[i][pi]]!=2) { pWeights[faces[i][pi]]=0.25;   }
 
 		scalarField pWeightsOrig(pWeights);
-		forAll(pNeips, vertI)
-		{
+		forAll(pNeips, pI) {
 
-			const labelLoop& neiPoints = pNeips[vertI];
+			const labelLoop& neiPoints = pNeips[pI];
 
-			scalar avgPWeights(pWeightsOrig[vertI]);
+			scalar avgPWeights(pWeightsOrig[pI]);
 			scalar sumWeightsKc(1.);
-			forAll(neiPoints, neiPointI)
-			{
-				const label neiVertI = neiPoints[neiPointI];
+			for(label pJ: neiPoints) {
 
 				scalar weight=1.;
-				avgPWeights += weight * pWeightsOrig[neiVertI];
+				avgPWeights += weight * pWeightsOrig[pJ];
 				sumWeightsKc += weight;
 			}
 			if (sumWeightsKc>0.5)
 			{
 				avgPWeights /= sumWeightsKc;//myEdges.size();
-				pWeights[vertI] =     0.99*avgPWeights + (1.-0.99)*pWeightsOrig[vertI]; ///. 0.3 affects convergence,  smaller value makes cl faces bigger
+				pWeights[pI] =     0.99*avgPWeights + (1.-0.99)*pWeightsOrig[pI]; ///. 0.3 affects convergence,  smaller value makes cl faces bigger
 			}
 			else
 			{
-				pWeights[vertI] = pWeightsOrig[vertI];
+				pWeights[pI] = pWeightsOrig[pI];
 			}
 
 		}
@@ -255,7 +252,7 @@ int main(int argc, char *argv[])
 		Info<<"smoothed  :/"<<endl<<endl;
 	}//===================================================================================
 
-	{
+	//{
 		Info<< "curvature move/smoothing, second round"<< endl;
 		label  nIters(      readLabel (smoothingDict.lookup("nIterationsCurvature")));
 		label  kernelRadius(readLabel (smoothingDict.lookup("kernelRadiusCurvature")));
@@ -280,9 +277,9 @@ int main(int argc, char *argv[])
 			#include "./curvatureMove.H"
 		}
 		Info<<"smoothed  :/"<<endl<<endl;
-	}//===================================================================================
 
 
+	//}//===================================================================================
 
 
 	Info<<average(mag(surf123.points()))<< "  :avgMagPoints    "<<endl;
@@ -290,7 +287,7 @@ int main(int argc, char *argv[])
 
 
 
-    Info<< "Writing surface to " << outFileName << " ..." << endl;
+	Info<< "Writing surface to " << outFileName << " ..." << endl;
 
 
 	#include "./calcContAngle.H"

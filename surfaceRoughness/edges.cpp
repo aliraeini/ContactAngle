@@ -60,14 +60,14 @@ void Foam::primitiveMesh::calcEdges() const
   // create a list of edges for each face and store for efficiency
   edgeListList edgesOfFace(nFaces());
 
-  for_ (f, faceI)  {
-		edgesOfFace[faceI] = f[faceI].edges();
+  for_ (f, fI)  {
+		edgesOfFace[fI] = f[fI].edges();
 
-		maxEdges += f[faceI].nEdges();
+		maxEdges += f[fI].nEdges();
 
-		labelList& curFE = fe[faceI];
+		labelList& curFE = fe[fI];
 
-		curFE.setSize(f[faceI].nEdges());
+		curFE.setSize(f[fI].nEdges());
 
 		for_ (curFE, curFEI)  {
 			 curFE[curFEI] = -1;
@@ -88,9 +88,9 @@ void Foam::primitiveMesh::calcEdges() const
 		DynamicList<DynamicList<label, edgesPerPoint_> > faceGivingNeighbour;
 		DynamicList<DynamicList<label, edgesPerPoint_> > edgeOfFaceGivingNeighbour;
 
-		for_ (curFaces, faceI)  {
+		for_ (curFaces, fI)  {
 			 // get the edges
-			 const edgeList& fEdges = edgesOfFace[curFaces[faceI]];
+			 const edgeList& fEdges = edgesOfFace[curFaces[fI]];
 
 			 // for every edge
 			 for_(fEdges, edgeI)  {
@@ -122,7 +122,7 @@ void Foam::primitiveMesh::calcEdges() const
 								  added = true;
 
 								  // Remember the face and edge giving neighbour
-								  faceGivingNeighbour[eopI].append(curFaces[faceI]);
+								  faceGivingNeighbour[eopI].append(curFaces[fI]);
 
 								  edgeOfFaceGivingNeighbour[eopI].append(edgeI);
 
@@ -135,7 +135,7 @@ void Foam::primitiveMesh::calcEdges() const
 							 addedNeighbours.append(secondPoint);
 
 							 // Remember the face and subShape giving neighbour
-							 faceGivingNeighbour(addedNeighbours.size() - 1).append(curFaces[faceI]);
+							 faceGivingNeighbour(addedNeighbours.size() - 1).append(curFaces[fI]);
 							 edgeOfFaceGivingNeighbour(addedNeighbours.size() - 1).append(edgeI);
 						}
 				  }

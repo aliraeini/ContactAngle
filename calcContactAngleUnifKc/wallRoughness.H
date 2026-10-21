@@ -28,10 +28,10 @@ Description
 
       scalarField pAreasS(pAreas);
       vectorField pNwS(pAw);
-      forAll(pointPoints, vertI)
+      forAll(pointPoints, pI)
       {
-         const labelLoop& neiPoints = pointPoints[vertI];
-         //~ label currentLabel = pMarks[vertI];
+         const labelLoop& neiPoints = pointPoints[pI];
+         //~ label currentLabel = pMarks[pI];
          //~ if( currentLabel == 2 || currentLabel == 4  )
          { ///. calculating smooth weight
              scalar avgAKcp(0.);
@@ -39,18 +39,18 @@ Description
              scalar sumWeightsKc(1e-18);
              forAll(neiPoints, neiPointI)
              {
-                 const label neiVertI = neiPoints[neiPointI];
+                 const label pJ = neiPoints[neiPointI];
                  {    scalar weight=1.;
-                     if( pMarks[neiVertI]==4 ) weight *= 0.1;
-                     avgAKcp += weight * pAreas[neiVertI];
-                     avgpNorm += pAw[neiVertI];
+                     if( pMarks[pJ]==4 ) weight *= 0.1;
+                     avgAKcp += weight * pAreas[pJ];
+                     avgpNorm += pAw[pJ];
                      sumWeightsKc += 1.;
                  }
              }
              if (sumWeightsKc>1e-15)
              {
-                 pAreasS[vertI]   =    0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pAreasS[vertI];
-                 pNwS[vertI]   =    avgpNorm/sumWeightsKc;
+                 pAreasS[pI]   =    0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pAreasS[pI];
+                 pNwS[pI]   =    avgpNorm/sumWeightsKc;
              }
          }
      }
@@ -66,12 +66,12 @@ Description
          ///. point-normal curvature
 		 scalarField Kcw(pAreasS.size());
          scalarField pKcw(pNw.size(),0.);
-         forAll(faces,faceI)
+         forAll(faces,fI)
          {
-         label corLabel=fMarks[faceI];
+         label corLabel=fMarks[fI];
              if ( corLabel==1 || corLabel==3)
              {///. compute Kcw
-                 const face & f=faces[faceI];
+                 const face & f=faces[fI];
                  forAll(f, pI)
                  {
 
@@ -80,7 +80,7 @@ Description
                      vector Nex2=(pNs[e[0]] + pNs[e[1]]);
                      vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-                     vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[faceI]*/) ^ (Ce-Cf[faceI])) + 0.5*mag(Ce-Cf[faceI])/(mag(L_E)+1e-18)*(L_E);
+                     vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[fI]*/) ^ (Ce-Cf[fI])) + 0.5*mag(Ce-Cf[fI])/(mag(L_E)+1e-18)*(L_E);
 
 					 pKcw[e[0]] += Le_se & pNw[e[0]];
 					 pKcw[e[1]] -= Le_se & pNw[e[1]];
@@ -100,22 +100,22 @@ Description
 	  for (int iKern=0; iKern<kernelRadius; ++iKern)
       {
         scalarField pKcwTmp(Kcw);
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
-            const labelLoop& neiPoints = pointPoints[vertI];
+            const labelLoop& neiPoints = pointPoints[pI];
 			{
 				//vector Ra(vector::zero);
-				scalar R(pKcwTmp[vertI]);
+				scalar R(pKcwTmp[pI]);
 				scalar sumWeights(1e-16);
-				if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
+				if ( pMarks[pI] == 1 || pMarks[pI] == 3 || pMarks[pI] == 4)
 				{
 				  forAll(neiPoints, neiPointI)
 				  {
-					const label neiVertI = neiPoints[neiPointI];
-					if( pMarks[neiVertI]!=2 && pKcwTmp[neiVertI]>0)
+					const label pJ = neiPoints[neiPointI];
+					if( pMarks[pJ]!=2 && pKcwTmp[pJ]>0)
 					{
 						scalar weight=1.;
-						R += weight * pKcwTmp[neiVertI];
+						R += weight * pKcwTmp[pJ];
 						sumWeights += weight;
 					}
 					else{
@@ -128,11 +128,11 @@ Description
 			    }
 				if (sumWeights>0.05)
 				{
-					Ra[vertI] = R/sumWeights;//myEdges.size();
+					Ra[pI] = R/sumWeights;//myEdges.size();
 				}
-				//if (Ra[vertI]!=0)
+				//if (Ra[pI]!=0)
 				//{
-					//Ra[vertI] = 1/Ra[vertI];
+					//Ra[pI] = 1/Ra[pI];
 				//}
 			}
 
@@ -146,32 +146,32 @@ Description
       for (int iKern=0; iKern<kernelRadius; ++iKern)
       {
 			scalarField pKcwSmoothTmp(pKcwSmooth);
-			forAll(pointPoints, vertI)
+			forAll(pointPoints, pI)
 			{
 
-				const labelLoop& neiPoints = pointPoints[vertI];
-				label currentLabel = pMarks[vertI];
+				const labelLoop& neiPoints = pointPoints[pI];
+				label currentLabel = pMarks[pI];
 				if( currentLabel == 1 || currentLabel == 3 || currentLabel == 4  )
 				{ ///. calculating smooth curvature
-					scalar avgAKcp(pKcwSmoothTmp[vertI]);
+					scalar avgAKcp(pKcwSmoothTmp[pI]);
 					scalar sumWeightsKc(1.);
 					forAll(neiPoints, neiPointI)
 					{
-						const label neiVertI = neiPoints[neiPointI];
-						if( currentLabel == 1 || currentLabel == 3 || pMarks[neiVertI] == 4  )
+						const label pJ = neiPoints[neiPointI];
+						if( currentLabel == 1 || currentLabel == 3 || pMarks[pJ] == 4  )
 						{
-							scalar weight=pWeights[neiVertI];
+							scalar weight=pWeights[pJ];
 							//weight*=weight;weight*=weight;
-							//if( pMarks[neiVertI] == 4) weight*=0.01;
-							//~ if( pMarks[neiVertI] == 4 && currentLabel == 4) weight=10.;
-							avgAKcp += weight * pKcwSmoothTmp[neiVertI];
+							//if( pMarks[pJ] == 4) weight*=0.01;
+							//~ if( pMarks[pJ] == 4 && currentLabel == 4) weight=10.;
+							avgAKcp += weight * pKcwSmoothTmp[pJ];
 							sumWeightsKc += weight;
 						}
 					}
 					if (sumWeightsKc>0.5)
-						pKcwSmooth[vertI] =     0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pKcwSmoothTmp[vertI];
+						pKcwSmooth[pI] =     0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pKcwSmoothTmp[pI];
 					else
-						pKcwSmooth[vertI] = pKcwSmoothTmp[vertI];
+						pKcwSmooth[pI] = pKcwSmoothTmp[pI];
 				}
 		   }
 	  }
@@ -182,31 +182,31 @@ Description
       for (int iKern=0; iKern<kernelRadius+2; ++iKern)
       {
 			scalarField pKcwSmooth2Tmp(pKcwSmooth2);
-			forAll(pointPoints, vertI)
+			forAll(pointPoints, pI)
 			{
-				const labelLoop& neiPoints = pointPoints[vertI];
-				label currentLabel = pMarks[vertI];
+				const labelLoop& neiPoints = pointPoints[pI];
+				label currentLabel = pMarks[pI];
 				if( currentLabel == 1 || currentLabel == 3 || currentLabel == 4  )
 				{ ///. calculating smooth curvature
-					scalar avgAKcp(pKcwSmooth2Tmp[vertI]);
+					scalar avgAKcp(pKcwSmooth2Tmp[pI]);
 					scalar sumWeightsKc(1.);
 					forAll(neiPoints, neiPointI)
 					{
-						const label neiVertI = neiPoints[neiPointI];
-						if( currentLabel == 1 || currentLabel == 3 || pMarks[neiVertI] == 4  )
+						const label pJ = neiPoints[neiPointI];
+						if( currentLabel == 1 || currentLabel == 3 || pMarks[pJ] == 4  )
 						{
-							scalar weight=pWeights[neiVertI];
+							scalar weight=pWeights[pJ];
 							//weight*=weight;weight*=weight;
-							//if( pMarks[neiVertI] == 4) weight*=0.01;  ///.  TODO change 0.01 : 0-1
-							//~ if( pMarks[neiVertI] == 4 && currentLabel == 4) weight=10.;
-							avgAKcp += weight * pKcwSmooth2Tmp[neiVertI];
+							//if( pMarks[pJ] == 4) weight*=0.01;  ///.  TODO change 0.01 : 0-1
+							//~ if( pMarks[pJ] == 4 && currentLabel == 4) weight=10.;
+							avgAKcp += weight * pKcwSmooth2Tmp[pJ];
 							sumWeightsKc += weight;
 						}
 					}
 					if (sumWeightsKc>0.5)
-						pKcwSmooth2[vertI] =     0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pKcwSmooth2Tmp[vertI];
+						pKcwSmooth2[pI] =     0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pKcwSmooth2Tmp[pI];
 					else
-						pKcwSmooth2[vertI] = pKcwSmooth2Tmp[vertI];
+						pKcwSmooth2[pI] = pKcwSmooth2Tmp[pI];
 				}
 
 		   }
@@ -216,16 +216,16 @@ Description
 
 
         vectorField displacementsRc(newPoints.size(), vector(0,0,0));
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
 
 
-            label currentLabel = pMarks[vertI];
+            label currentLabel = pMarks[pI];
 
              if(currentLabel == 1 || currentLabel == 3 || currentLabel == 4)
              {  ///. curvature uniformization
-                 newPoints[vertI] +=  pNw[vertI] * relax*(0.5*(pKcw[vertI]-pKcwSmooth[vertI])+8.*(pKcwSmooth[vertI]-pKcwSmooth2[vertI]))
-												*Foam::sqrt(pAreas[vertI]/ (pKcwSmooth[vertI]*pKcwSmooth[vertI]  +0.1/pAreasS[vertI]));  ///.  TODO change -2. , etc
+                 newPoints[pI] +=  pNw[pI] * relax*(0.5*(pKcw[pI]-pKcwSmooth[pI])+8.*(pKcwSmooth[pI]-pKcwSmooth2[pI]))
+												*Foam::sqrt(pAreas[pI]/ (pKcwSmooth[pI]*pKcwSmooth[pI]  +0.1/pAreasS[pI]));  ///.  TODO change -2. , etc
              }
 
 		}
@@ -244,46 +244,46 @@ Description
 
 	vectorField displacements(newPoints.size(), vector(0,0,0));
 	//~ vectorField displacementsCL(newPoints.size(), vector(0,0,0));
-	forAll(pointPoints, vertI)
+	forAll(pointPoints, pI)
 	{
 
-		const labelLoop& neiPoints = pointPoints[vertI];
-		label currentLabel = pMarks[vertI];
+		const labelLoop& neiPoints = pointPoints[pI];
+		label currentLabel = pMarks[pI];
 
 
 		vector avgPos(vector::zero);
 		scalar sumWeights(1e-28);
-		//if ( pMarks[vertI] == 4 )
+		//if ( pMarks[pI] == 4 )
 		//{
 			//forAll(neiPoints, neiPointI)
 			//{
-				//const label neiVertI = neiPoints[neiPointI];
+				//const label pJ = neiPoints[neiPointI];
 
-				//scalar weight=(pAreas[neiVertI]+0.1*pAreas[vertI]);//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-				//weight*=weight*pWeights[neiVertI];
-				//if( pMarks[neiVertI]!=currentLabel ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence
-				//point neiPos=newPoints[neiVertI];
-				//if( pMarks[neiVertI]==2 )
+				//scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+				//weight*=weight*pWeights[pJ];
+				//if( pMarks[pJ]!=currentLabel ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence
+				//point neiPos=newPoints[pJ];
+				//if( pMarks[pJ]==2 )
 				//{
-					//neiPos -= 1.01*((neiPos-newPoints[vertI])&pNw[vertI])*pNw[vertI];    ///.  TODO change 1.05
+					//neiPos -= 1.01*((neiPos-newPoints[pI])&pNw[pI])*pNw[pI];    ///.  TODO change 1.05
 				//}
-				//else if( pMarks[neiVertI] == 4) weight *= 8.; ///. TODO: Change 3.333, remove ...
+				//else if( pMarks[pJ] == 4) weight *= 8.; ///. TODO: Change 3.333, remove ...
 				//avgPos += weight * neiPos;
 				//sumWeights += weight;
 			//}
 
 		//}
-		if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
+		if ( pMarks[pI] == 1 || pMarks[pI] == 3 || pMarks[pI] == 4)
 		{
 			forAll(neiPoints, neiPointI)
 			{
-				const label neiVertI = neiPoints[neiPointI];
+				const label pJ = neiPoints[neiPointI];
 
-				scalar weight=(pAreas[neiVertI]+0.1*pAreas[vertI]);//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-				weight*=weight*pWeights[neiVertI];
-				//~ if( pMarks[neiVertI]!=currentLabel ) weight*=0.9;     ///.  TODO change 0.7, smaller value makes CL faces bigger
-				//~ if( pMarks[neiVertI]==3 ) weight*=2.;     ///.  TODO change 0.7, smaller value makes CL faces bigger
-				avgPos += weight * newPoints[neiVertI];
+				scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+				weight*=weight*pWeights[pJ];
+				//~ if( pMarks[pJ]!=currentLabel ) weight*=0.9;     ///.  TODO change 0.7, smaller value makes CL faces bigger
+				//~ if( pMarks[pJ]==3 ) weight*=2.;     ///.  TODO change 0.7, smaller value makes CL faces bigger
+				avgPos += weight * newPoints[pJ];
 				sumWeights += weight;
 
 		  }
@@ -292,7 +292,7 @@ Description
 			if (sumWeights>1e-18)
 			{
 				avgPos /= sumWeights;//myEdges.size();
-				displacements[vertI] = avgPos-newPoints[vertI]; //(0.8*relax)*((avgPos-newPoints[vertI])&pNw[vertI])*pNw[vertI] + (0.2*relax)*(avgPos-newPoints[vertI]);
+				displacements[pI] = avgPos-newPoints[pI]; //(0.8*relax)*((avgPos-newPoints[pI])&pNw[pI])*pNw[pI] + (0.2*relax)*(avgPos-newPoints[pI]);
 			}
 
 
@@ -302,17 +302,17 @@ Description
 				//~ scalar sumWeights(1e-16);
 				//~ forAll(neiPoints, iii)
 				//~ {
-					//~ const label neiVertI = neiPoints[iii];
-					//~ if( pMarks[neiVertI] == 4  )
+					//~ const label pJ = neiPoints[iii];
+					//~ if( pMarks[pJ] == 4  )
 					//~ {
 						//~ scalar weight=1.;
-						//~ avgPos += weight * newPoints[neiVertI];
+						//~ avgPos += weight * newPoints[pJ];
 						//~ sumWeights += weight;
 					//~ }
 				//~ }
-				//~ vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI];
-				//~ DispCL =  (DispCL & pNs[vertI])*pNs[vertI];
-				//~ displacementsCL[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
+				//~ vector DispCL =  (avgPos/sumWeights-newPoints[pI]); // relax*((avgPos/sumWeights-newPoints[pI])&pNs[pI])*pNs[pI];
+				//~ DispCL =  (DispCL & pNs[pI])*pNs[pI];
+				//~ displacementsCL[pI] =  (DispCL - (DispCL & pNw[pI])*pNw[pI]);
 			//~ }
 
       }
@@ -328,26 +328,26 @@ Description
      for (int iKern=0; iKern<2; ++iKern)
      {
  	  vectorField displacementsTmp = displacements;
-      forAll(pointPoints, vertI)
+      forAll(pointPoints, pI)
       {
-		label currentLabel = pMarks[vertI];
+		label currentLabel = pMarks[pI];
 		bool curentLabelEq2 = currentLabel==2;
 		{ ///. contact line smoothing Vol preserve
-			const labelLoop& neiPoints = pointPoints[vertI];
+			const labelLoop& neiPoints = pointPoints[pI];
 			vector avgDisp(vector::zero);
 			scalar sumWeights(1e-28);
 			forAll(neiPoints, iii)
 			{
-				const label neiVertI = neiPoints[iii];
-				if( pMarks[neiVertI]==currentLabel || !( (pMarks[neiVertI]==2) ^ curentLabelEq2)  || pMarks[neiVertI] == 4  )
+				const label pJ = neiPoints[iii];
+				if( pMarks[pJ]==currentLabel || !( (pMarks[pJ]==2) ^ curentLabelEq2)  || pMarks[pJ] == 4  )
 				{
-					scalar weight=pAreas[neiVertI];
-					avgDisp += weight * displacementsTmp[neiVertI];
+					scalar weight=pAreas[pJ];
+					avgDisp += weight * displacementsTmp[pJ];
 					sumWeights += weight;
 				}
 			}
 
-			displacements[vertI] = avgDisp/sumWeights;//myEdges.size();
+			displacements[pI] = avgDisp/sumWeights;//myEdges.size();
 
 		}
       }
@@ -379,70 +379,69 @@ Description
 	  for (int iKern=0; iKern<kernelRadius; ++iKern)
       {
         //scalarField pKcwTmp(pKcwSmooth2);
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
-            const labelLoop& neiPoints = pointPoints[vertI];
+            const labelLoop& neiPoints = pointPoints[pI];
 			{
-				scalar RS(D[vertI]);
+				scalar RS(D[pI]);
 				scalar sumWeights(1e-16);
-				if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
+				if ( pMarks[pI] == 1 || pMarks[pI] == 3 || pMarks[pI] == 4)
 				{
 				  forAll(neiPoints, neiPointI)
 				  {
-					const label neiVertI = neiPoints[neiPointI];
-					if( pMarks[neiVertI]!=2 && D[neiVertI]>0)
-					{
-						scalar weight=1.;
-						RS += weight * D[neiVertI];
-						sumWeights += weight;
-					}
-				  }
+					const label pJ = neiPoints[neiPointI];
+					if( pMarks[pJ]!=2 && D[pJ]>0)
+				{
+					scalar weight=1.;
+					RS += weight * D[pJ];
+					sumWeights += weight;
+				}
+			  }
 
 			    }
 				if (sumWeights>0.05)
 				{
-					//RaS[vertI] = RS/sumWeights;
-					Ra[vertI] = RS/sumWeights;
+					//RaS[pI] = RS/sumWeights;
+					Ra[pI] = RS/sumWeights;
 				}
-				//if (Ra[vertI]!=0)
+				//if (Ra[pI]!=0)
 				//{
-					//Ra[vertI] = 1/Ra[vertI];
+					//Ra[pI] = 1/Ra[pI];
 				//}
 			}
-
-		}
-    }
-    //Ra = RaS-Ra;
-
-
-	///Ra_x.txt
-	std::ofstream  offRaX("Ra_x.txt");
-	offRaX<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
-	forAll(pointPoints, vertI)
-	{
-		label currentLabel = pMarks[vertI];
-		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)
-		{
-			offRaX<<"";
-			offRaX<<points[vertI][0]<<" "<<points[vertI][1]<<" "<<points[vertI][2]<<" "<<Ra[vertI]<<" \n";
-		}
 	}
-	offRaX.close();
+}
+ //Ra = RaS-Ra;
 
-   ///Ra.txt
-	std::ofstream  offRa("Ra.txt");
-	offRa<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
-	forAll(pMarks, vertI)
+
+///Ra_x.txt
+std::ofstream  offRaX("Ra_x.txt");
+offRaX<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
+forAll(pointPoints, pI)
 	{
-		label currentLabel = pMarks[vertI];
-		if (currentLabel==1 || currentLabel==3 || pMarks[vertI] == 4)
+		label currentLabel = pMarks[pI];
+		if (currentLabel==1 || currentLabel==3 || pMarks[pI] == 4)
 		{
-			offRa<< Ra[vertI] <<" \n";
-		}else{
-			offRa<<  0 <<"\n";
-		}
-   }
-   offRa.close();
+		offRaX<<"";
+		offRaX<<points[pI][0]<<" "<<points[pI][1]<<" "<<points[pI][2]<<" "<<Ra[pI]<<" \n";
+	}
+}
+offRaX.close();
+
+///Ra.txt
+	std::ofstream  offRa("Ra.txt");
+offRa<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
+forAll(pMarks, pI)
+	{
+		label currentLabel = pMarks[pI];
+		if (currentLabel==1 || currentLabel==3 || pMarks[pI] == 4)
+		{
+		offRa<< Ra[pI] <<" \n";
+	}else{
+		offRa<<  0 <<"\n";
+	}
+}
+offRa.close();
 
 
 

@@ -41,8 +41,10 @@ Developed by: Ali Q Raeini (2010-2022)
 #include "DynamicField.H"
 #include "MeshedSurfaces.H"
 
+#include "InputFile.h"
 #include "voxelImage.h"
 #include "voxelImageI.h"
+#include "voxelImageProcess.h"
 #include "createSurface.h"
 
 using namespace Foam;

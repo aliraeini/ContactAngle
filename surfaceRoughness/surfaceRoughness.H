@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -28,27 +28,24 @@ Description
 
       scalarField pAreasS(pAreas);
       vectorField pNwS(pAw);
-      forAll(pointPoints, vertI)
+      forAll(pointPoints, pI)
       {
-         const labelLoop& neiPoints = pointPoints[vertI];
+         const labelLoop& neiPoints = pointPoints[pI];
          { ///. calculating smooth weight
              scalar avgAKcp(0.);
              vector avgpNorm(0.,0.,0.);
              scalar sumWeightsKc(1e-18);
-             forAll(neiPoints, neiPointI)
-             {
-                 const label neiVertI = neiPoints[neiPointI];
-                 {    scalar weight=1.;
-                     if( pMarks[neiVertI]==4 ) weight *= 0.1;
-                     avgAKcp += weight * pAreas[neiVertI];
-                     avgpNorm += pAw[neiVertI];
-                     sumWeightsKc += 1.;
-                 }
+             for(label pJ: neiPoints) {
+                  scalar weight=1.;
+                  if( pMarks[pJ]==4 ) weight *= 0.1;
+                  avgAKcp += weight * pAreas[pJ];
+                  avgpNorm += pAw[pJ];
+                  sumWeightsKc += 1.;
              }
              if (sumWeightsKc>1e-15)
              {
-                 pAreasS[vertI]   =    0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pAreasS[vertI];
-                 pNwS[vertI]   =    avgpNorm/sumWeightsKc;
+                 pAreasS[pI] = 0.5*avgAKcp/sumWeightsKc + (1.-0.5)*pAreasS[pI];
+                 pNwS[pI]    =  avgpNorm/sumWeightsKc;
              }
          }
      }
@@ -64,12 +61,12 @@ Description
          ///. point-normal curvature
 		 scalarField Kcw(pAreasS.size());
          scalarField pKcw(pNw.size(),0.);
-         forAll(faces,faceI)
+         forAll(faces,fI)
          {
-         label corLabel=fMarks[faceI];
-             if ( corLabel==1 || corLabel==3 || corLabel==4) 
+         label corLabel=fMarks[fI];
+             if ( corLabel==1 || corLabel==3 || corLabel==4)
              {///. compute Kcw
-                 const face & f=faces[faceI];
+                 const face & f=faces[fI];
                  forAll(f, pI)
                  {
 
@@ -77,9 +74,9 @@ Description
 					 vector L_E=newPoints[e[1]] - newPoints[e[0]];
                      vector Nex2=(pNs[e[0]] + pNs[e[1]]);
                      vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
-                     
-                     vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[faceI]*/) ^ (Ce-Cf[faceI])) + 0.5*mag(Ce-Cf[faceI])/(mag(L_E)+1e-18)*(L_E);
-				
+
+                     vector Le_se = 0.5*(0.5*(Nex2/*+fNorms[fI]*/) ^ (Ce-Cf[fI])) + 0.5*mag(Ce-Cf[fI])/(mag(L_E)+1e-18)*(L_E);
+
 					 pKcw[e[0]] += Le_se & pNw[e[0]];
 					 pKcw[e[1]] -= Le_se & pNw[e[1]];
                  }
@@ -87,45 +84,39 @@ Description
          }
          pKcw /= (pAreas);
          Kcw = mag(pKcw);
-         
+
 
       Info <<"     Roughness original,"; cout.flush();
 	  scalarField Ra(Kcw);
 	  for (int iKern=0; iKern<kernelRadius; ++iKern)
       {
         scalarField pKcwTmp(Kcw);
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
-            const labelLoop& neiPoints = pointPoints[vertI];
+            const labelLoop& neiPoints = pointPoints[pI];
 			{
-				scalar R(pKcwTmp[vertI]);
-				scalar sumWeights(1e-16); 
-				scalar sumpAreas(1e-16); 
-					if ( pMarks[vertI] == 1 || pMarks[vertI] == 3 || pMarks[vertI] == 4)
+				scalar R(pKcwTmp[pI]);
+				scalar sumWeights(1e-16);
+				scalar sumpAreas(1e-16);
+					if ( pMarks[pI] == 1 || pMarks[pI] == 3 || pMarks[pI] == 4)
 					{
-					  forAll(neiPoints, neiPointI)
-					  {
-						const label neiVertI = neiPoints[neiPointI];
-						if( pMarks[neiVertI]!=2)
+					  for(label pJ: neiPoints) {
+						if( pMarks[pJ]!=2)
 						{
 							scalar weight=1.;
-							R += weight * pKcwTmp[neiVertI]* pAreas[neiVertI];
+							R += weight * pKcwTmp[pJ]* pAreas[pJ];
 							sumWeights += weight;
-							sumpAreas += pAreas[neiVertI];
+							sumpAreas += pAreas[pJ];
 						}
-						
-						
-						
-						
 					  }
 
 					}
 
 				if (sumWeights>0.05)
 				{
-					Ra[vertI] = mag(R)/sumWeights;//myEdges.size();
-					//Ra[vertI] = mag(R)/sumpAreas;//myEdges.size();
-					//Ra[vertI] = (R*avgAreaR)/sumWeights;//myEdges.size();
+					Ra[pI] = mag(R)/sumWeights;//myEdges.size();
+					//Ra[pI] = mag(R)/sumpAreas;//myEdges.size();
+					//Ra[pI] = (R*avgAreaR)/sumWeights;//myEdges.size();
 				}
 
 			}
@@ -151,134 +142,130 @@ Description
 	Info<< "BMid = "<<BMid<<endl;;
 	(Info<< " *  ").flush();
 
-		
+
 		///Ra_x.txt
 		std::ofstream  offRaX("Ra_x.txt");
 		offRaX<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
 
-		forAll(pointPoints, vertI)
+		forAll(pointPoints, pI)
 		{
-			label currentLabel = pMarks[vertI];
-			if (currentLabel==1 || currentLabel==3 || currentLabel==4)	
+			label currentLabel = pMarks[pI];
+			if (currentLabel==1 || currentLabel==3 || currentLabel==4)
 			{
-				if(	
+				if(
 				///cylindrical image
-					mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 && mag(points[vertI][2]-BMax[2])>5.*vxlsize 
-				 &&	mag(BMid - points[vertI] - ((BMid - points[vertI])&zz)*zz)<(radius-5.*vxlsize)
-				 
+					mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 && mag(points[pI][2]-BMax[2])>5.*vxlsize
+				 &&	mag(BMid - points[pI] - ((BMid - points[pI])&zz)*zz)<(radius-5.*vxlsize)
+
 				///cubical image
-					//mag(points[vertI][0]-BMin[0])>5.*vxlsize 
-				 //&& mag(points[vertI][0]-BMax[0])>5.*vxlsize
-				 //&& mag(points[vertI][1]-BMin[1])>5.*vxlsize 
-				 //&& mag(points[vertI][1]-BMax[1])>5.*vxlsize
-				 //&& mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 //&& mag(points[vertI][2]-BMax[2])>5.*vxlsize
+					//mag(points[pI][0]-BMin[0])>5.*vxlsize
+				 //&& mag(points[pI][0]-BMax[0])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMin[1])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMax[1])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMax[2])>5.*vxlsize
 				  )
 				{
 					offRaX<<"";
-					offRaX<<points[vertI][0]<<" "<<points[vertI][1]<<" "<<points[vertI][2]<<" "<<Ra[vertI]<<" \n";
+					offRaX<<points[pI][0]<<" "<<points[pI][1]<<" "<<points[pI][2]<<" "<<Ra[pI]<<" \n";
 				}
 			}
-		}		
+		}
 		offRaX.close();
 		Info  <<"Ra_x.txt is written "; cout.flush();
 		///pKcw_x.txt
 		std::ofstream  ofpKcw("pKcw_x.txt");
 		ofpKcw<<"ppKcw 1 "<<pointPoints.size()<<" float"<<std::endl;
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
-			label currentLabel = pMarks[vertI];
-			if (currentLabel==1||currentLabel==3|| currentLabel==4)		
+			label currentLabel = pMarks[pI];
+			if (currentLabel==1||currentLabel==3|| currentLabel==4)
 			{
 				if(
 				///cylindrical image
-					mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 && mag(points[vertI][2]-BMax[2])>5.*vxlsize 
-				 &&	mag(BMid - points[vertI] - ((BMid - points[vertI])&zz)*zz)<(radius-5.*vxlsize)
-				 
+					mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 && mag(points[pI][2]-BMax[2])>5.*vxlsize
+				 &&	mag(BMid - points[pI] - ((BMid - points[pI])&zz)*zz)<(radius-5.*vxlsize)
+
 				 ///cubical image
-					//mag(points[vertI][0]-BMin[0])>5.*vxlsize 
-				 //&& mag(points[vertI][0]-BMax[0])>5.*vxlsize
-				 //&& mag(points[vertI][1]-BMin[1])>5.*vxlsize 
-				 //&& mag(points[vertI][1]-BMax[1])>5.*vxlsize
-				 //&& mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 //&& mag(points[vertI][2]-BMax[2])>5.*vxlsize
+					//mag(points[pI][0]-BMin[0])>5.*vxlsize
+				 //&& mag(points[pI][0]-BMax[0])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMin[1])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMax[1])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMax[2])>5.*vxlsize
 				  )
 				  {
 					ofpKcw<<"";
-					ofpKcw<<points[vertI][0]<<" "<<points[vertI][1]<<" "<<points[vertI][2]<<" "<<pKcw[vertI]<<" \n";
+					ofpKcw<<points[pI][0]<<" "<<points[pI][1]<<" "<<points[pI][2]<<" "<<pKcw[pI]<<" \n";
 				  }
-			}  
+			}
        }
        ofpKcw.close();
        Info  <<"pKcw.txt is written "; cout.flush();
-       
+
        ///pA_x.txt
 		std::ofstream  ofpA("pA_x.txt");
 		ofpA<<"pArea 1 "<<pointPoints.size()<<" float"<<std::endl;
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
-			label currentLabel = pMarks[vertI];
-			if (currentLabel==1||currentLabel==3)		
+			label currentLabel = pMarks[pI];
+			if (currentLabel==1||currentLabel==3)
 			{
 				if(
 				///cylindrical image
-					mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 && mag(points[vertI][2]-BMax[2])>5.*vxlsize 
-				 &&	mag(BMid - points[vertI] - ((BMid - points[vertI])&zz)*zz)<(radius-5.*vxlsize)
-				 
+					mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 && mag(points[pI][2]-BMax[2])>5.*vxlsize
+				 &&	mag(BMid - points[pI] - ((BMid - points[pI])&zz)*zz)<(radius-5.*vxlsize)
+
 				 ///cubical image
-					//mag(points[vertI][0]-BMin[0])>5.*vxlsize 
-				 //&& mag(points[vertI][0]-BMax[0])>5.*vxlsize
-				 //&& mag(points[vertI][1]-BMin[1])>5.*vxlsize 
-				 //&& mag(points[vertI][1]-BMax[1])>5.*vxlsize
-				 //&& mag(points[vertI][2]-BMin[2])>5.*vxlsize 
-				 //&& mag(points[vertI][2]-BMax[2])>5.*vxlsize
+					//mag(points[pI][0]-BMin[0])>5.*vxlsize
+				 //&& mag(points[pI][0]-BMax[0])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMin[1])>5.*vxlsize
+				 //&& mag(points[pI][1]-BMax[1])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMin[2])>5.*vxlsize
+				 //&& mag(points[pI][2]-BMax[2])>5.*vxlsize
 				  )
 				  {
 					ofpA<<"";
-					ofpA<<points[vertI][0]<<" "<<points[vertI][1]<<" "<<points[vertI][2]<<" "<<pAreas[vertI]<<" \n";
+					ofpA<<points[pI][0]<<" "<<points[pI][1]<<" "<<points[pI][2]<<" "<<pAreas[pI]<<" \n";
 				  }
-			}  
+			}
        }
        ofpA.close();
-       Info  <<"pA_x.txt is written "; cout.flush(); 
-       
-		
+       Info  <<"pA_x.txt is written "; cout.flush();
+
+
 		///Ra.txt
 		std::ofstream  offRa("Ra.txt");
 		offRa<<"POINT_DATA "<<pointPoints.size()<<std::endl;
 		offRa<<"FIELD attributes 2 "<<std::endl;
 		offRa<<"Ra 1 "<<pointPoints.size()<<" float"<<std::endl;
-		forAll(pMarks, vertI)
+		forAll(pMarks, pI)
 		{
-			label currentLabel = pMarks[vertI];
-			if (currentLabel==1 || currentLabel==3 )	
+			label currentLabel = pMarks[pI];
+			if (currentLabel==1 || currentLabel==3 )
 			{
-				offRa<< Ra[vertI] <<" \n";
+				offRa<< Ra[pI] <<" \n";
 			}else{
 				offRa<<  0 <<"\n";
 			}
 		}
 		offRa<<"pKcw 1 "<<pointPoints.size()<<" float"<<std::endl;
-		forAll(pMarks, vertI)
+		forAll(pMarks, pI)
 		{
-			label currentLabel = pMarks[vertI];
-			if (currentLabel==1 || currentLabel==3 )	
+			label currentLabel = pMarks[pI];
+			if (currentLabel==1 || currentLabel==3 )
 			{
-				offRa<< pKcw[vertI] <<" \n";
+				offRa<< pKcw[pI] <<" \n";
 			}else{
 				offRa<<  0 <<"\n";
 			}
-		}		
+		}
 		offRa.close();
 		Info  <<"Ra.txt is written "; cout.flush();
- 
+
 		Info<< "  maxRa:  "<<max(Ra); cout.flush();
 		Info<< "  avgRa:  "<<average(Ra); cout.flush();
 		Info<<endl;
-       
-	
-	
-        

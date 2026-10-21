@@ -61,7 +61,7 @@ Description
      pNwS/=(mag(pNwS)+1e-18);
      vectorField  pNw=pAw/(mag(pAw)+1e-18);
 
-     vectorField previousPoints(newPoints);
+vectorField previousPoints(newPoints);
 
 
 
@@ -375,13 +375,13 @@ Description
 
 
 	//===========================================================================
-	//===========================================================================
-	//================= Gausian like smoothing during curvature move ===========
-	//================== to smooth point positions laterally ====================
-	//===========================================================================
+//===========================================================================
+//================= Gausian like smoothing during curvature move ===========
+//================== to smooth point positions laterally ====================
+//===========================================================================
 
 
-     vectorField previousPoints2(newPoints);
+vectorField previousPoints2(newPoints);
 
 
 
@@ -399,45 +399,44 @@ Description
 			{
 				const label pJ = neiPoints[neiPointI];
 
-				scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);
-				weight*=weight*pWeights[pJ];
-				if( pMarks[pJ]!=markI ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence
-				point neiPos=newPoints[pJ];
-				if( pMarks[pJ]==2 )
-				{
-					neiPos -= 1.01*((neiPos-newPoints[pI])&pNw[pI])*pNw[pI];    ///.  TODO change 1.05
-				}
-				else if( pMarks[pJ] == 4) weight *= 8.; ///. TODO: Change 3.333, remove ...
-				avgPos += weight * neiPos;
-				sumWeights += weight;
+			scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);
+			weight*=weight*pWeights[pJ];
+			if( pMarks[pJ]!=markI ) weight*=0.1;  ///.  TODO change 0.5,   , affects convergence
+			point neiPos=newPoints[pJ];
+			if( pMarks[pJ]==2 ) {
+				neiPos -= 1.01*((neiPos-newPoints[pI])&pNw[pI])*pNw[pI];    ///.  TODO change 1.05
 			}
+			else if( pMarks[pJ] == 4) weight *= 8.; ///. TODO: Change 3.333, remove ...
+			avgPos += weight * neiPos;
+			sumWeights += weight;
+		}
 
 		}
-		else
+	else
 		{
 			forAll(neiPoints, neiPointI)
 			{
 				const label pJ = neiPoints[neiPointI];
 
-				scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
-				weight*=weight*pWeights[pJ];
-				//if( pMarks[pJ]!=markI ) weight*=0.9;     ///.  TODO change 0.7, smaller value makes CL faces bigger
-				//if( pMarks[pJ]==3 ) weight*=2.;     ///.  TODO change 0.7, smaller value makes CL faces bigger
-				avgPos += weight * newPoints[pJ];
-				sumWeights += weight;
+			scalar weight=(pAreas[pJ]+0.1*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+			weight*=weight*pWeights[pJ];
+			//if( pMarks[pJ]!=markI ) weight*=0.9;     ///.  TODO change 0.7, smaller value makes CL faces bigger
+			//if( pMarks[pJ]==3 ) weight*=2.;     ///.  TODO change 0.7, smaller value makes CL faces bigger
+			avgPos += weight * newPoints[pJ];
+			sumWeights += weight;
 
-			}
 		}
+	}
 
-		if (sumWeights>1e-18)
-		{
-			avgPos /= sumWeights;//myEdges.size();
-			displacements[pI] = avgPos-newPoints[pI]; //(0.8*relax)*((avgPos-newPoints[pI])&pNw[pI])*pNw[pI] + (0.2*relax)*(avgPos-newPoints[pI]);
-		}
+	if (sumWeights>1e-18)	{
+		avgPos /= sumWeights;//myEdges.size();
+		displacements[pI] = avgPos-newPoints[pI]; //(0.8*relax)*((avgPos-newPoints[pI])&pNw[pI])*pNw[pI] + (0.2*relax)*(avgPos-newPoints[pI]);
+	}
 
-      }
-	  newPoints += 0.5*relax*(displacements - 0.5*(displacements& pNw)*pNw);
-	  //newPoints += 0.03*relaxCL*displacementsCL;
+}
+newPoints += 0.5*relax*(displacements - 0.5*(displacements& pNw)*pNw);
+//newPoints += 0.03*relaxCL*displacementsCL;
+
 
 
 /// moving contact line back to the solid wall (alleviate the crunch effect)
@@ -471,28 +470,26 @@ Description
 			displacements[pI] = avgDisp/sumWeights;
 
 		}
-      }
 	}
+}
 
-	displacements = 0.3*displacements+0.7*(displacements& pNw)*pNw;
-	displacements = 0.3*displacements+0.7*(displacements& pNs)*pNs;
-	newPoints -= 1.09*displacements;     ///.  TODO change 0.5 0.5,  sum should be 1
+displacements = 0.3*displacements+0.7*(displacements& pNw)*pNw;
+displacements = 0.3*displacements+0.7*(displacements& pNs)*pNs;
+newPoints -= 1.09*displacements;     ///.  TODO change 0.5 0.5,  sum should be 1
 
-	Info  <<"CL "; cout.flush();
-
-
-
-
-	surf123.movePoints(newPoints);
+Info  <<"CL "; cout.flush();
 
 
 
-	displacements = newPoints-previousPoints;
 
-	Info<< "  A:  ["<<min(pAreas)<<" "<<max(pAreas)<<"] "; cout.flush();
-	Info<< "  k:  ["<<min(pKc); cout.flush();
-	//Info<< " "<< 0.004+(double(average(max(min((pKc-0.004)*1e8,1e6),-1e6)*max(pMarks-3,0))))/(0.0001+double(average(100000*max(pMarks-3,0))))/1000.; cout.flush();
-	Info<< " "<<max(pKc); cout.flush();
-	Info<< "],  DispMag  max:  "<<max(mag(displacements)); cout.flush();
-	Info<< "  avg:  "<<average(mag(displacements)); cout.flush();
+surf123.movePoints(newPoints);
+
+
+
+displacements = newPoints-previousPoints;
+Info<< "  A:  ["<<min(pAreas)<<" "<<max(pAreas)<<"] "; cout.flush();
+Info<< "  k:  ["<<min(pKc); cout.flush();
+Info<< " "<<max(pKc); cout.flush();
+Info<< "],  DispMag  max:  "<<max(mag(displacements)); cout.flush();
+Info<< "  avg:  "<<average(mag(displacements)); cout.flush();
 	Info<<endl;

@@ -30,27 +30,27 @@ Description
 
      vectorField pNw(pointPoints.size(),vector(0,0,0));
      vectorField pNs(pointPoints.size(),vector(0,0,0));
-     forAll(faces,faceI)
-     {   const face & f=faces[faceI];
+     forAll(faces,fI)
+     {   const face & f=faces[fI];
          forAll(f, pI)
          {   edge e=f.faceEdge(pI);
              vector Ce=0.5*(newPoints[e[0]] + newPoints[e[1]]);
 
-             vector pNE=0.5*((newPoints[e[0]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
-             if( pMarks[e[0]]==fMarks[faceI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
-             else if( fMarks[faceI] != 2 )        pNw[e[0]] += pNE;
+             vector pNE=0.5*((newPoints[e[0]]-Cf[fI]) ^ (Ce-Cf[fI]));
+             if( pMarks[e[0]]==fMarks[fI] ) {    pNw[e[0]] += pNE;    pNs[e[0]] += pNE;    }
+             else if( fMarks[fI] != 2 )        pNw[e[0]] += pNE;
              else                                pNs[e[0]] += pNE;
 
-             pNE=0.5*((newPoints[e[1]]-Cf[faceI]) ^ (Ce-Cf[faceI]));
-             if( pMarks[e[1]]==fMarks[faceI] ) {    pNw[e[1]] -= pNE;    pNs[e[1]] -= pNE;    }
-             else if( fMarks[faceI] != 2 )        pNw[e[1]] -= pNE;
-             else                                pNs[e[1]] -= pNE;//2.*pNE-mag(pNE)*fNorms[faceI];
-		 }    
+             pNE=0.5*((newPoints[e[1]]-Cf[fI]) ^ (Ce-Cf[fI]));
+             if( pMarks[e[1]]==fMarks[fI] ) {    pNw[e[1]] -= pNE;    pNs[e[1]] -= pNE;    }
+             else if( fMarks[fI] != 2 )        pNw[e[1]] -= pNE;
+             else                                pNs[e[1]] -= pNE;//2.*pNE-mag(pNE)*fNorms[fI];
+		 }
      }
      scalarField pAreas(0.5*mag(pNs)+1e-18+0.5*mag(pNw));
      pNs/=(mag(pNs)+1e-18);
      pNw/=(mag(pNw)+1e-18);
-		
+
 	const vectorField previousPoints(newPoints);
 
 
@@ -61,25 +61,23 @@ Description
       {
         vectorField displacements(newPoints.size(), vector(0,0,0));
         vectorField displacementsCL(newPoints.size(), vector(0,0,0));
-        forAll(pointPoints, vertI)
+        forAll(pointPoints, pI)
         {
 
-            const labelLoop& neiPoints = pointPoints[vertI];
-            
+            const labelLoop& neiPoints = pointPoints[pI];
+
 			{
 				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16); 
-				if ( pMarks[vertI] == 4 )
+				scalar sumWeights(1e-16);
+				if ( pMarks[pI] == 4 )
 				{
-				  forAll(neiPoints, neiPointI)
-				  {
-					const label neiVertI = neiPoints[neiPointI];
-					if( pMarks[neiVertI]!=2 )
+				  for(label pJ: neiPoints) {
+					if( pMarks[pJ]!=2 )
 					{
-						//~ scalar weight=pWeights[neiVertI];//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-						scalar weight=(pAreas[neiVertI]+0.3*pAreas[vertI]);//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-						weight*=weight*pWeights[neiVertI];
-						avgPos += weight * newPoints[neiVertI];
+						//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+						scalar weight=(pAreas[pJ]+0.3*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+						weight*=weight*pWeights[pJ];
+						avgPos += weight * newPoints[pJ];
 						sumWeights += weight;
 					}
 				  }
@@ -87,48 +85,43 @@ Description
 			  }
 			  else
 			  {
-			    forAll(neiPoints, neiPointI)
-				  {
-					const label neiVertI = neiPoints[neiPointI];
+			    for(label pJ: neiPoints) {
 
-					//~ scalar weight=pWeights[neiVertI];//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-					scalar weight=(pAreas[neiVertI]+0.3*pAreas[vertI]);//*max(NormalsOld[neiVertI]&NormalsOld[vertI],0.001);// /mag(newPoints[neiVertI]-newPoints[vertI]);
-					weight*=weight*pWeights[neiVertI];
-					avgPos += weight * newPoints[neiVertI];
+					//~ scalar weight=pWeights[pJ];//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+					scalar weight=(pAreas[pJ]+0.3*pAreas[pI]);//*max(NormalsOld[pJ]&NormalsOld[pI],0.001);// /mag(newPoints[pJ]-newPoints[pI]);
+					weight*=weight*pWeights[pJ];
+					avgPos += weight * newPoints[pJ];
 					sumWeights += weight;
 
 				  }
 			  }
-			  
+
 				if (sumWeights>0.1)
 				{
 					avgPos /= sumWeights;//myEdges.size();
-					displacements[vertI] = avgPos-newPoints[vertI]; //(0.8*relax)*((avgPos-newPoints[vertI])&pNw[vertI])*pNw[vertI] + (0.2*relax)*(avgPos-newPoints[vertI]);
+					displacements[pI] = avgPos-newPoints[pI]; //(0.8*relax)*((avgPos-newPoints[pI])&pNw[pI])*pNw[pI] + (0.2*relax)*(avgPos-newPoints[pI]);
 				}
 			}
 
 
 
-            if( pMarks[vertI] == 4  )
-            { ///. contact line smoothing
+			if( pMarks[pI] == 4  )	{ ///. contact line smoothing
 				vector avgPos(vector::zero);
-				scalar sumWeights(1e-16); 
-                forAll(neiPoints, pI)
-                {
-                    const label neiVertI = neiPoints[pI];
-                    if( pMarks[neiVertI] == 4  )
-                    {
-                        scalar weight=1.;
-                        avgPos += weight * newPoints[neiVertI];
-                        sumWeights += weight;
-                    }
-                }
+				scalar sumWeights(1e-16);
+				for(label pJ: neiPoints) {
+					if( pMarks[pJ] == 4  )
+					{
+							scalar weight=1.;
+							avgPos += weight * newPoints[pJ];
+							sumWeights += weight;
+					}
+				}
 
-                vector DispCL =  (avgPos/sumWeights-newPoints[vertI]); // relax*((avgPos/sumWeights-newPoints[vertI])&pNs[vertI])*pNs[vertI]; 
-                DispCL =  (DispCL & pNs[vertI])*pNs[vertI];
-                displacementsCL[vertI] =  (DispCL - (DispCL & pNw[vertI])*pNw[vertI]);
+				vector DispCL =  (avgPos/sumWeights-newPoints[pI]); // relax*((avgPos/sumWeights-newPoints[pI])&pNs[pI])*pNs[pI];
+				DispCL =  (DispCL & pNs[pI])*pNs[pI];
+				displacementsCL[pI] =  (DispCL - (DispCL & pNw[pI])*pNw[pI]);
 
-            }
+			}
 
       }
 
@@ -150,29 +143,27 @@ Description
 	const vectorField dispAverageTmp(dispAverage);
 
 	//~ vectorField NormalsOld(pNw);
-	forAll(pointPoints, vertI)
+	forAll(pointPoints, pI)
 	{
 		vector avgDisp(vector::zero);
 		scalar sumWeights(1e-16);
 
-		const labelLoop& neiPoints = pointPoints[vertI];
-		label currentLabel = pMarks[vertI];
+		const labelLoop& neiPoints = pointPoints[pI];
+		label currentLabel = pMarks[pI];
 		bool curentLabelEq2 = currentLabel==2;
 
-		forAll(neiPoints, neiPointI)
-		{
-			const label neiVertI = neiPoints[neiPointI];
+		for(label pJ: neiPoints) {
 
-			if( pMarks[neiVertI]==currentLabel || !( (pMarks[neiVertI]==2) ^ curentLabelEq2)  || pMarks[neiVertI] == 4  )
+			if( pMarks[pJ]==currentLabel || !( (pMarks[pJ]==2) ^ curentLabelEq2)  || pMarks[pJ] == 4  )
 			{
 				//~ scalar weight=1.;
-				scalar weight=pAreas[neiVertI];
-				if( pMarks[neiVertI]!=pMarks[vertI] ) weight*=0.05;
-				avgDisp += weight * dispAverageTmp[neiVertI];
+				scalar weight=pAreas[pJ];
+				if( pMarks[pJ]!=pMarks[pI] ) weight*=0.05;
+				avgDisp += weight * dispAverageTmp[pJ];
 				sumWeights += weight;
 			}
 		}
-		dispAverage[vertI] = avgDisp/sumWeights;//myEdges.size();
+		dispAverage[pI] = avgDisp/sumWeights;//myEdges.size();
 	  }
 	}
 
@@ -192,4 +183,3 @@ Description
 	Info<< "  avgMag:  "<<average(mag(dispAverage)); cout.flush();
 	Info<< "  avg:  "<<average(dispAverage); cout.flush();
 	Info<<endl;
-

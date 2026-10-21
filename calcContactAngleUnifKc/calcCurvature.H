@@ -52,19 +52,19 @@ Rc 1 75466 float
 
     scalarField curvature(fNorms.size(),1e-12);
      ///. TODO to define normal vectors separately
-    forAll(faces,faceI)
+    forAll(faces,fI)
     {
-        const face & f=faces[faceI];
+        const face & f=faces[fI];
         forAll(f, pI)
         {
-			if( pMarks[f[pI]] != 4 ||  fMarks[faceI] == 1 )
+			if( pMarks[f[pI]] != 4 ||  fMarks[fI] == 1 )
 			{
 				edge e=f.faceEdge(pI);
 			    vector Le_se = 0.5*(pNw[e[0]] + pNw[e[1]]) ^ e.vec(newPoints);
-			    curvature[faceI] += Le_se & fNorms[faceI];
+			    curvature[fI] += Le_se & fNorms[fI];
 		    }
         }
-		curvature[faceI] /= f.mag(newPoints);
+		curvature[fI] /= f.mag(newPoints);
     }
 
 

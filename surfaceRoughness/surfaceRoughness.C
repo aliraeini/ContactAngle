@@ -1,13 +1,13 @@
-/*-------------------------------------------------------------------------*\	
-You can redistribute this code and/or modify this code under the 
-terms of the GNU General Public License (GPL) as published by the  
-Free Software Foundation, either version 3 of the License, or (at 
+/*-------------------------------------------------------------------------*\
+You can redistribute this code and/or modify this code under the
+terms of the GNU General Public License (GPL) as published by the
+Free Software Foundation, either version 3 of the License, or (at
 your option) any later version. see <http://www.gnu.org/licenses/>.
 
 
-The code has been developed by Ahmed AlRatrout as a part his PhD 
-at Imperial College London, under the supervision of Dr. Branko Bijeljic 
-and Prof. Martin Blunt. 
+The code has been developed by Ahmed AlRatrout as a part his PhD
+at Imperial College London, under the supervision of Dr. Branko Bijeljic
+and Prof. Martin Blunt.
 
 Please see our website for relavant literature:
 AlRatrout et al, AWR, 2017 - https://www.sciencedirect.com/science/article/pii/S0309170817303342
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 
 runTime++;
 Info<< "Time = " << runTime.timeName() << "\n" << endl;
- 
- 
+
+
     IOdictionary meshingDict
     (
         IOobject
@@ -77,12 +77,12 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
         )
     );
     dictionary smoothingDict(meshingDict.subDict("surfaceRoughness"));
-    
+
     word surfFileName(smoothingDict.lookup("inputSurface"));
 
     fileName outFileName(smoothingDict.lookup("outputSurface"));
 
-    
+
 
 
 
@@ -106,9 +106,9 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
     const List<face> & faces=surf123.faces();
     DynamicList<DynamicList<label> > pointPointsTmp(points.size());
     List<labelLoop> pointPoints(points.size());
-    forAll(faces,faceI)
+    forAll(faces,fI)
     {
-        const face & f=faces[faceI];
+        const face & f=faces[fI];
         forAll(f, pI)
         {
            appendUnique(pointPointsTmp[ f[pI] ], f.nextLabel(pI));
@@ -137,7 +137,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 		/// rock-water interface -> 1
-		/// rock-oil   interface -> 3		
+		/// rock-oil   interface -> 3
 		/// oil-water interface -> 2
 		/// contact line points ->  4
 
@@ -169,29 +169,27 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 		for (label i=zones[1].start(); i<zones[2].start();  ++i)  forAll(faces[i],pi) if (pMarks[faces[i][pi]]!=2) { pWeights[faces[i][pi]]=0.25;   }
 
 		scalarField pWeightsOrig(pWeights);
-		forAll(pointPoints, vertI)
+		forAll(pointPoints, pI)
 		{
 
-			const labelLoop& neiPoints = pointPoints[vertI];
+			const labelLoop& neiPoints = pointPoints[pI];
 
-			scalar avgPWeights(pWeightsOrig[vertI]);
+			scalar avgPWeights(pWeightsOrig[pI]);
 			scalar sumWeightsKc(1.);
-			forAll(neiPoints, neiPointI)
-			{
-				const label neiVertI = neiPoints[neiPointI];
+			for(label pJ: neiPoints) {
 
 				scalar weight=1.;
-				avgPWeights += weight * pWeightsOrig[neiVertI];
+				avgPWeights += weight * pWeightsOrig[pJ];
 				sumWeightsKc += weight;
 			}
 			if (sumWeightsKc>0.5)
 			{
 				avgPWeights /= sumWeightsKc;//myEdges.size();
-				pWeights[vertI] =     0.99*avgPWeights + (1.-0.99)*pWeightsOrig[vertI]; ///. 0.3 affects convergence,  smaller value makes cl faces bigger
+				pWeights[pI] =     0.99*avgPWeights + (1.-0.99)*pWeightsOrig[pI]; ///. 0.3 affects convergence,  smaller value makes cl faces bigger
 			}
 			else
 			{
-				pWeights[vertI] = pWeightsOrig[vertI];
+				pWeights[pI] = pWeightsOrig[pI];
 			}
 
 	   }
@@ -228,7 +226,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 		if ((relax < 0) || (relax > 1))
 				FatalErrorIn(args.executable()) << "Illegal relaxation factor " << relax
 				 << endl << "0: no change 1: move vertices to average of neighbours" << exit(FatalError);
-		
+
 		Info<< "Relax:" << relax << endl;
 		Info<< "kernel radius:" << kernelRadius << endl;
 		Info<< "Iters:" << iters << endl;
@@ -253,7 +251,6 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 
 
 	//#include "./calcContAngle.H"
-	
 
 
     surf123.write(outFileName);
@@ -262,7 +259,7 @@ Info<< "Time = " << runTime.timeName() << "\n" << endl;
 	Info << "\n"<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
 	<< " ClockTime = " << runTime.elapsedClockTime() << " s"
 	<< "\n" << endl;
-	 
+
     Info << "End\n" << endl;
 
     return 0;
