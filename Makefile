@@ -1,10 +1,10 @@
 msSrc  ?= ${abspath ..}
-msInst ?= ${abspath ../..}
+MS_INST ?= ${abspath ../..}
 
 ifneq "${OPT}" ".exe"
 all:  ;
 	$(MAKE) -f  ${msSrc}/script/Makefile.in  recurseMake USE_msRecurse=1
-	cp AllRunContAngle  ${msInst}/bin/foamx4m/
+	cp AllRunContAngle  ${MS_INST}/bin/foamxm/
 else
 all: ; @echo skipping ${CURDIR}
 endif

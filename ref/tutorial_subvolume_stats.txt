@@ -1,0 +1,14 @@
+ContactAngMax 138.91891
+ContactAngMin 10.215092
+ContactAngAvg 75.31197
+nPoints 92062
+CA_count 1822
+CA_mean 74.6889
+CA_std 16.6907
+CA_min 10.2151
+CA_max 138.919
+Kc_count 8913
+Kc_mean 7.57727e-08
+Kc_std 9.90709e-08
+Kc_min -1.1921e-06
+Kc_max 3.649e-06
