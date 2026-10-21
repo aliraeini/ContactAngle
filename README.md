@@ -1,5 +1,9 @@
 ***This is an experimental fork of the [automatic contact angle measurement code by AlRatrout et al (2017) code](https://github.com/AhmedAlratrout/ContactAngle-Curvature-Roughness). The algorithm has not changed in principle, but the code dependencies have, so it needs further testing -- use at your own risk***
 
+> **Note:** the curvature `Kc` is given in **1/voxel**, independent of the voxel size in the image header (earlier versions of
+> this fork gave 1/(1e6 x header length unit)); see [CHANGELOG.md](CHANGELOG.md). This fork has been refactored heavily compared to the
+> original code, and regression tracking against reference results ([ref/](ref/)) started only recently.
+
 <img align="right" width="50%" height="50%" src="https://github.com/AhmedAlratrout/ContactAngle-Curvature-Roughness/blob/master/docs/Fig2.png"/>
 
 # ContactAngle-Curvature-Roughness
