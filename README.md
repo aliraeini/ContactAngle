@@ -29,7 +29,7 @@ Note: Not all OpenFOAM codes support the surface zones required by this code and
 Prepare your image as in the tutorial folder ( a .mhd header file and the image data in .raw or .raw.gz or .tif or .am format).  Then run, in the same folder:
 
 ```  {.bash language="bash"}
-PATH/TO/src/ContAngle/AllRunContAngle  IMAGE.mhd
+PATH/TO/ContAngle/AllRunContAngle  IMAGE.mhd
 ```
 If the `IMAGE.mhd` argument is not provided, the script will run for all the `.mhd` files located in the working directory of your terminal.  If a system folder is available in current directory of the terminal, it will be used, otherwise the the system folder is copied from the one in tutorial folder.   Therefore, if you want to modify the code settings, you can copy the system folder from the tutorial folder to current directory: `cp PATH/TO/src/ContactAngle/tutorial/system .`
 

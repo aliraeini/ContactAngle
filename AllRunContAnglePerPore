@@ -15,8 +15,8 @@ echo $ImageNames
 
 #msSrc=/opt/contactAngleAhmedAlratrout2017/apps
 #source $msSrc/contactAngle/bashrc
-# Figure out Paths assuming this file is in src/ContactAngle folder
-myCurrentDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../src" && pwd )
+# Figure out Paths assuming this file is in the ContAngle folder
+myCurrentDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 : ${msSrc:=$myCurrentDIR} ; export msSrc
 [ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $msSrc/script/bashrc"
 [ -n "$WM_PROJECT" ] || source $msSrc/script/bashrc

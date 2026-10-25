@@ -15,12 +15,13 @@ echo $ImageNames
 
 
 
-# Figure out Paths assuming this file is in src/ContactAngle folder
+# Figure out Paths assuming this file is in the ContAngle folder
 myDir=`cd "$(dirname "${BASH_SOURCE[0]}")/" && pwd`
 [ -n "$WM_PROJECT" ] || echo "WM_PROJECT not set, sourcing $myDir/script/foam.bashrc"
 [ -n "$WM_PROJECT" ] || source $myDir/script/foam.bashrc \
                      || source $myDir/../script/foam.bashrc \
-                     || source $myDir/../src/script/foam.bashrc
+                     || source $myDir/../../script/foam.bashrc \
+                     || source $msSrc/script/foam.bashrc
 
 
 for ImgNam in $ImageNames ; do

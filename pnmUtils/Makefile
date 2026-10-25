@@ -1,5 +1,5 @@
 # warning type clean, dependencies are not handelled yet
-msSrc ?= $(abspath ../../../src)
+msSrc ?= $(abspath ../..)
 
 mains =   writeCAPoreInds  writepAreaPoreInds
 all: $(mains)

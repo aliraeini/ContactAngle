@@ -2,7 +2,7 @@
 
 all: msApp
 
-msSrc ?= $(abspath ../../../src)
+msSrc ?= $(abspath ../..)
 
 USE_MINIFOAMX3=1
 OFCs=$(shell find | grep -F .C | sed s:./::)
@@ -14,5 +14,7 @@ USE_TIFF=1
 USE_VOX_IMG=1
 USE_POCKETPY=1
 USE_msMAKE=1
-msCFLAGS += -I${msSrc}/../msmkit/voxutils -I${msSrc}/../msmkit/primitives -I${msSrc}/../msmkit/optim
+ifneq ($(wildcard ${msSrc}/../msmkit),)
+ msCFLAGS += -I${msSrc}/../msmkit/voxutils -I${msSrc}/../msmkit/primitives -I${msSrc}/../msmkit/optim
+endif
 include  ${msSrc}/script/Makefile.in

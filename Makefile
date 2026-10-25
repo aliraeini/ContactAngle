@@ -1,5 +1,5 @@
 
-export msSrc ?= $(abspath ../../src)
+export msSrc ?= $(abspath ..)
 MS_INST ?= ../../..
 
 
