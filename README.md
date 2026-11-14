@@ -1,3 +1,9 @@
+> [!CAUTION]
+> **Archived copy, not further developed.** This folder is kept for reference only. Another archived version is
+> [aliraeini/vxlSrfCA](https://github.com/aliraeini/vxlSrfCA). The next generation contact angle and curvature measurement code
+> is being integrated into **image3kit**: [DigiPorFlow/image3kit](https://github.com/DigiPorFlow/image3kit) and
+> [difizix/image3kit](https://github.com/difizix/image3kit).
+
 ***This is an experimental fork of the [automatic contact angle measurement code by AlRatrout et al (2017) code](https://github.com/AhmedAlratrout/ContactAngle-Curvature-Roughness). The algorithm has not changed in principle, but the code dependencies have, so it needs further testing -- use at your own risk***
 
 > **Note:** the curvature `Kc` is given in **1/voxel**, independent of the voxel size in the image header (earlier versions of
